@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+	
+{% endblock %}
+
+
+{% block jquery %}
+	
+{% endblock %}
+
+
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row border-top-gray" id="create-task-progress">
+	<div class="container">
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-user glyphicon-md" ></span> <span>1. Register Profile</span>
+		</div>
+		<div class="col-md-4 section-static col-middle text-center orange">
+			<span class="glyphicon glyphicon-home glyphicon-md" ></span> <span>2. Add Address</span>
+		</div>
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-random glyphicon-md"></span>  <span>3. Payment Method</span>
+		</div>
+	</div>
+</div>
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form action="{% url 'accounts:register-address' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+				{% csrf_token %}
+				<div class="col-md-12 task-field-container">
+					{% for field in form %}
+						<div class="form-group">
+							{{ field.label }}
+							{{ field }}
+						</div>
+					{% endfor %}
+				</div>
+				<input type="submit" value="Continue" id="add_task" class="btn-blue btn-blue-effect col-xs-12" />
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+
+
+{% for task in tasks %}
+	<div class="thumbnail col-md-3">
+		<img src="#" class="img-circle" />
+		<div class="caption">
+			<p>Title: {{ task.title }}</p>
+			<p>Description: {{ task.description }}</p>
+			<p>Special Instructions: {{ task.special_instructions }}</p>
+			<p>Posted by: {{ task.user.username }}</p>
+			<p><a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-success">View</a></p>
+		</div>
+	</div>
+	{% cycle '' '' '' '</div><div class="row">' %}
+{% endfor %}

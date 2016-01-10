@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="row">
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row section-static border-top-gray section-light-gray">
+	<div class="container">
+		<div class="col-md-2">
+
+		</div>
+		<div class="col-md-10">
+			{% for contractor in object_list %}
+			<div class="thumbnail thumbnail-task-list col-md-12">
+				{% if contractor.profile_pic %}
+					<img src="{{ contractor.profile_pic.url }}" class="col-md-3"/>
+				{% else %}
+					<img src="#" class="col-md-3" />
+				{% endif %}
+
+				<div class="caption col-md-9">
+					<h3>{{ contractor.first_name }} {{ contractor.last_name }}</h3>
+					<p>{{ contractor.description }}</p>
+					{% if contractor.is_online %}
+					<p><span class="glyphicon glyphicon-fire"></span> <span>Online Now</span>
+					{% endif %}
+					<p><a href="{% url 'accounts:detail_contractor' contractor.id %}" class="btn-orange btn-orange-effect">View Profile</a><button type="button" class="btn-blue btn-blue-effect pull-right" id="create-chat">Chat</button></p>
+
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+

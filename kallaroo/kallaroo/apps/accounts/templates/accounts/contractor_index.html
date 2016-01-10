@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<h1 class="text-center">Contractor Registration/Login</h1>
+		<div class="col-md-6">
+			<form action="{% url 'accounts:register_contractor' %}" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				{{ reg_form.as_p }}
+				<input type="submit" value="Register" class="btn-register btn-register-effect" />
+			</form>
+		</div>
+		<div class="col-md-6">
+			<form action="{% url 'accounts:login_contractor' %}" method="POST">
+				{% csrf_token %}
+				{{ login_form.as_p }}
+				<input type="submit" value="Login" class="btn-login btn-login-effect" />
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

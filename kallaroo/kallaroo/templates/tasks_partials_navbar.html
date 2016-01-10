@@ -1,0 +1,6 @@
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="{% url 'accounts:all-tasks' user.id %}" class="task-tab-link">All My Tasks</a></li>
+  <li role="presentation"><a href="{% url 'accounts:active-tasks' user.id %}" class="task-tab-link">Active Tasks</a></li>
+  <li role="presentation"><a href="{% url 'accounts:open-tasks' user.id %}" class="task-tab-link">Open Tasks</a></li>
+  <li role="presentation"><a href="{% url 'accounts:completed-tasks' user.id %}" class="task-tab-link">Completed Tasks</a></li>
+</ul>

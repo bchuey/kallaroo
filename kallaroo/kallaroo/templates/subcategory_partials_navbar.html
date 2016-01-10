@@ -1,0 +1,5 @@
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="{% url 'categories:subcategory-task-list' object.id %}" class="subcategory-tab-link">Tasks</a></li>
+  <li role="presentation"><a href="{% url 'categories:subcategory-contractor-list' object.id %}" class="subcategory-tab-link">Contractors</a></li>
+  <li class="pull-right">{{ object.title }}</li>
+</ul>

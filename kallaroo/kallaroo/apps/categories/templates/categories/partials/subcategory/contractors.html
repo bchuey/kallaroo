@@ -1,0 +1,14 @@
+
+{% for contractor in contractors %}
+	<div class="thumbnail col-md-3">
+		<img src="#" class="img-circle" />
+		<div class="caption">
+			<p>Name: {{ contractor.contractor.username }}</p>
+			<p>Rating: {{ contractor.rating }}</p>
+			{% if contractor.contractor.is_online == True %}
+				<span class="glyphicon glyphicon-fire"></span> <span>Online Now</span>
+			{% endif %}
+		</div>
+	</div>
+	{% cycle '' '' '' '</div><div class="row">' %}
+{% endfor %}

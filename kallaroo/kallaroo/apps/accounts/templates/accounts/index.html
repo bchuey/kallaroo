@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="row">
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<h1 class="text-center">Registration/Login</h1>
+		<div class="col-md-6">
+			
+		</div>
+		<div class="col-md-6">
+			<form action="{% url 'accounts:login' %}" method="POST">
+				{% csrf_token %}
+				{{ login_form.as_p }}
+				<input type="submit" value="Login" class="btn-login btn-login-effect" />
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

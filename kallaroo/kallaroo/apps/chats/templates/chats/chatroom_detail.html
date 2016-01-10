@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+  <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+
+{% endblock %}
+
+{% block sockets %}
+	var socket = io.connect('http://127.0.0.1:3000');
+	var room_id = {{ object.id }};
+
+	socket.emit("room-number", {room_id: room_id});
+
+
+	// create javascript event listener
+	$("#send-msg-btn").click(function(){
+
+		// grab the value in the input field
+		var user_id = {{ request.user.id }}
+		var msg = $("#msg").val();
+		var chatroom_id = {{ object.id }};
+
+		// create a socket event
+		socket.emit("send-message", {
+			// pass through the msg value
+			user_id: user_id,
+			msg: msg,
+			chatroom_id: chatroom_id,
+		});
+
+		// set the msg input field to empty
+		$("#msg").val('');
+	});
+
+	socket.on('message', function(context){
+
+
+		console.log(context);
+
+		//var obj = jQuery.parseJSON(context);
+		//console.log(obj);
+		$("#chats").append("<p>" + context + "</p>");
+		
+	});
+
+	// socket.on('response-message', function(message){
+		// console.log(message);
+	// });
+
+	/*
+	$('#chats').append("<div class='media'><div class='media-left'><span class='glyphicon glyphicon-user glyphicon-lg'></span></div><div class='media-body'><div class='well'><h4>" + author + "<span class='pull-right'>" + written_at + "</span></h4><p>" + msg + "</p></div></div></div>");
+	*/
+
+{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="container">
+		<div class="col-md-8 col-md-push-2 text-center">
+			<h3>Welcome to chatroom #{{ object.id }}!</h3>
+			<h4>Participants in the chatroom:</h4>
+			<div class="col-md-6">
+				<img src="">
+				<h4> name </h4>
+			</div>
+			<div class="col-md-6">
+				<img src="">
+				<h4> name </h4>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row section-static">
+	<div class="container">
+		<div id="chats" class="col-md-8 col-md-push-2">
+			{% if msgs %}
+				{% for msg in msgs %}
+					<div class="media">
+						<div class="media-left">
+							<span class="glyphicon glyphicon-user glyphicon-lg"></span>
+						</div>
+						<div class="media-body">
+							<div class="well">
+								<h4>{{ msg.author }} <span class="pull-right">{{ msg.written_at }}</span></h4>
+								<p>{{ msg.text }}</p>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+		<div class="form-inline col-md-8 col-md-push-2 section-static">
+			<div class="form-group">
+				<div class="col-md-12">
+					<input type="text" id="msg" class="form-control" />	
+					<button type="button" id="send-msg-btn" class="btn-blue btn-blue-effect">Send</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

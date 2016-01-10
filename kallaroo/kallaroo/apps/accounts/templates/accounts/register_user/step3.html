@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+{% endblock %}
+
+{% block jquery %}
+	
+		var clientToken = "{{ braintree_client_token }}";
+
+		// replace CLIENT-TOKEN-FROM-SERVER with generated client token
+		braintree.setup(clientToken, "dropin", {
+		  container: "dropin-container"
+		});
+
+		console.log(clientToken);
+
+{% endblock %}
+
+
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row border-top-gray" id="create-task-progress">
+	<div class="container">
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-user glyphicon-md" ></span> <span>1. Register Profile</span>
+		</div>
+		<div class="col-md-4 section-static col-middle text-center">
+			<span class="glyphicon glyphicon-home glyphicon-md" ></span> <span>2. Add Address</span>
+		</div>
+		<div class="col-md-4 section-static text-center orange">
+			<span class="glyphicon glyphicon-random glyphicon-md"></span> <span> 3. Payment Method</span>
+		</div>
+	</div>
+</div>
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form action="{% url 'accounts:register-payment' %}" method="POST">
+				{% csrf_token %}
+			  <div id="dropin-container"></div>
+			  <input type="submit" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
+			</form>
+			
+		</div>
+	</div>
+</div>
+
+{% endblock %}
