@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 from ..categories.models import Subcategory
 # from ..reviews.models import Review, Rating
 
@@ -13,8 +13,8 @@ class Task(models.Model):
 		('Completed', 'Completed'),
 		('Paid', 'Paid'),
 	)
-	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-	contractor = models.ForeignKey(Contractor, blank=True, null=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='task_client')
+	contractor = models.ForeignKey(User, blank=True, null=True, related_name='task_contractor')
 	title = models.CharField(max_length=120)
 	description = models.TextField(blank=True, null=True)
 	special_instructions = models.TextField(blank=True, null=True)
@@ -57,7 +57,7 @@ class Bid(models.Model):
 		('Project', 'Project'),
 
 	)
-	contractor = models.ForeignKey(Contractor)
+	contractor = models.ForeignKey(User, related_name='bidder')
 	task = models.ForeignKey(Task, on_delete=models.CASCADE)
 	is_accepted = models.BooleanField(default=False)
 	bid_type = models.CharField(max_length=20, choices=BID_CHOICES, default='Hourly')

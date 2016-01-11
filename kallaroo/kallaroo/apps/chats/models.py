@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 from django.db import models
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 # Create your models here.
 
 class Chatroom(models.Model):
-	creator = models.ForeignKey(User)
-	participant = models.ForeignKey(Contractor)
+	creator = models.ForeignKey(User, related_name='chatroom_host')
+	participant = models.ForeignKey(User, related_name='chatroom_participant')
 	created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
 
 	class Meta:

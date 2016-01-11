@@ -7,6 +7,15 @@
 
 {% block jquery %}
 	
+	// if the checkbox is checked
+	if(document.getElementById('id_is_contractor').checked){
+		// $("#id_subcategory").attr("disabled", true);
+		alert('hello');
+	}
+
+
+	
+
 {% endblock %}
 
 
@@ -33,15 +42,51 @@
 <div class="row section-light-gray border-top-gray">
 	<div class="container" id="task-form-container">
 		<div class="col-md-12">
-			<form action="{% url 'accounts:register-profile' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+			<form action="{% url 'accounts:register_profile' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
 				{% csrf_token %}
 				<div class="col-md-12 task-field-container">
-					{% for field in form %}
+					<!-- {% for field in form %}
 						<div class="form-group">
 							{{ field.label }}
 							{{ field }}
 						</div>
-					{% endfor %}
+					{% endfor %} -->
+					<div class="form-group">
+						{{ form.email.label }}
+						{{ form.email }}
+					</div>
+					<div class="form-group">
+						{{ form.username.label }}
+						{{ form.username }}
+					</div>
+					<div class="form-group">
+						{{ form.first_name.label }}
+						{{ form.first_name }}
+					</div>
+					<div class="form-group">
+						{{ form.last_name.label }}
+						{{ form.last_name }}
+					</div>
+					<div class="form-group">
+						{{ form.password1.label }}
+						{{ form.password1 }}
+					</div>
+					<div class="form-group">
+						{{ form.password2.label }}
+						{{ form.password2 }}
+					</div>
+					<div class="form-group">
+						{{ form.profile_pic.label }}
+						{{ form.profile_pic }}
+					</div>
+					<div class="form-group">
+						{{ form.is_contractor.label }}
+						{{ form.is_contractor }}
+					</div>
+					<div class="form-group">
+						{{ form.subcategory.label }}
+						{{ form.subcategory }}
+					</div>
 				</div>
 				<input type="submit" value="Continue" id="add_task" class="btn-blue btn-blue-effect col-xs-12" />
 			</form>

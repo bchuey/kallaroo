@@ -16,13 +16,19 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a href="{% url 'tasks:task_list' %}">Tasks</a></li>
-        <li><a href="{% url 'accounts:contractors_all' %}">Contractors</a></li>
+        {% if user.is_authenticated and not user.is_contractor %}
+        <li>
+            <a href="{% url 'accounts:contractors_all' %}">Contractors</a>
+        </li>
+        {% endif %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if user.is_authenticated %}
-        <li>
-          <a href="{% url 'tasks:task_step' 'subcategory' %}">Add Task</a>
-        </li>
+          {% if not user.is_contractor %}
+          <li>
+            <a href="{% url 'tasks:task_step' 'subcategory' %}">Add Task</a>
+          </li>
+          {% endif %}
         <li><a href="{% url 'accounts:dashboard' user.id %}">My Dashboard</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ user.username }} <span class="caret"></span></a>
@@ -37,11 +43,7 @@
         	<a href="{% url 'accounts:main' %}">Login</a>
         </li>
         {% endif %}
-        {% if 'contractor_id' in request.session %}
-        <li><a href="{% url 'accounts:logout_contractor' %}">Logout</a></li>
-        {% else %}
-        <li><a href="{% url 'accounts:main_contractor' %}">Contractor Login</a></li>
-        {% endif %}
+        
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

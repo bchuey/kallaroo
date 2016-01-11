@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View, TemplateView, ListView, DetailView
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
-from .forms import UserCreationForm, UserChangeForm, LoginForm, ContractorRegisterForm, ContractorLoginForm, ContractorProfileForm, UserAddressForm
-from .models import User, UserAddress, Contractor, ContractorProfile
+from .forms import UserCreationForm, UserChangeForm, LoginForm, UserAddressForm
+from .models import User, UserAddress
 from ..categories.models import Subcategory
 from ..tasks.models import Task
 from ..tasks.forms import CreateTaskForm
@@ -56,11 +56,15 @@ class RegisterProfileView(View):
 
 				user = User.objects.create_user(email, username, first_name, last_name, password)
 				user.profile_pic = request.FILES['profile_pic']
+				user.is_contractor = request.POST['is_contractor']
+				print(user.is_contractor)
+
+				user.subcategory = request.POST['subcategory']
 
 				user.braintree_id = user.get_braintree_id()
-				print(user.braintree_id)
+				# print(user.braintree_id)
 				user.braintree_client_token = user.get_client_token()
-				print(user.braintree_client_token)
+				# print(user.braintree_client_token)
 
 				user.save()
 
@@ -76,7 +80,7 @@ class RegisterProfileView(View):
 				print("=============")
 				request.session['user_id'] = user.id
 
-				return HttpResponseRedirect('%s'%(reverse('accounts:register-address')))
+				return HttpResponseRedirect('%s'%(reverse('accounts:register_address')))
 			else:
 				return render(request, self.template_name, context)
 
@@ -112,7 +116,7 @@ class RegisterAddressView(View):
 				address.user = user
 				address.save()
 
-				return HttpResponseRedirect('%s'%(reverse('accounts:register-payment')))
+				return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
 			else:
 				return render(request, self.template_name, context)
 
@@ -157,7 +161,7 @@ class RegisterPaymentView(View):
 			print("=============")
 			print("failed")
 			print("=============")
-			return HttpResponseRedirect('%s'%(reverse('accounts:register-payment')))
+			return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
 
 class UserProfileDetailView(DetailView):
 	model = User
@@ -269,94 +273,31 @@ class SuccessView(TemplateView):
 	template_name = 'accounts/success.html'
 
 
-class ContractorAccountView(TemplateView):
 
-	template_name = 'accounts/contractor_index.html'
-	def get_context_data(self, **kwargs):
-		context = super(ContractorAccountView, self).get_context_data(**kwargs)
-		context['reg_form'] = ContractorRegisterForm
-		context['login_form'] = ContractorLoginForm
-		return context
+"""
+=================
+Contractor
+=================
+"""
 
-def register_contractor(request):
-	context = {
-		'reg_form': ContractorRegisterForm,
-		'login_form': ContractorLoginForm,
-	}
+class AllContractorsView(View):
+	model = User
+	template_name = 'accounts/contractors/all.html'
 
-	form = ContractorRegisterForm(request.POST, request.FILES)
-	if request.method == "POST":
-		if form.is_valid():
-			new_contractor = Contractor()
-			new_contractor.username = request.POST['username']
-			new_contractor.email = request.POST['email']
-			new_contractor.first_name = request.POST['first_name']
-			new_contractor.last_name = request.POST['last_name']
-			new_contractor.password = request.POST['password']
-			new_contractor.profile_pic = request.FILES['profile_pic']
-			new_contractor.save()
+	def get(self, request, *args, **kwargs):
+		contractors = User.objects.all().filter(is_contractor=True)
+		context = {
+			'contractors': contractors,
+		}
 
-			new_profile = ContractorProfile()
-			contractor = Contractor.objects.get(id=new_contractor.id)
-			new_profile.contractor = contractor
-			subcategory = Subcategory.objects.get(id=request.POST['subcategory'])
-			new_profile.subcategory = subcategory
+		return render(request, self.template_name, context)
 
-			new_profile.save()
-
-			
-			print("=============")
-			print("contractor registered successfully")
-			print("=============")
-
-			return HttpResponseRedirect('/accounts/success')
-		else:
-			return render(request, 'accounts/contractor_index.html', context)
-	else:
-		return render(request, 'accounts/contractor_index.html', context)
-
-def login_contractor(request):
-
-	form = ContractorLoginForm(request.POST or None)
-
-	if request.method == 'POST':
-		if form.is_valid():
-			email = request.POST['email']
-			password = request.POST['password']
-			# contractor = authenticate(username=email, password=password)
-			# login(request, contractor)
-			contractor = Contractor.objects.get(email=email, password=password)
-			request.session['contractor_id'] = contractor.id
-			
-			contractor.is_online = True
-			contractor.save()
-			# messages.success(request, "Successfully logged in. Welcome!")
-			return HttpResponseRedirect('%s'%(reverse('accounts:detail_contractor', args=[request.session['contractor_id']])))
-			
-
-	context = {
-		"form": form,
-	}
-
-	return render(request, 'accounts/contractor_main.html', context)
-
-class ContractorListView(ListView):
-	model = Contractor
-	template_name = 'accounts/contractor_list.html'
-
-class ContractorDetailView(DetailView):
-	model = Contractor
-	template_name = 'accounts/contractor_detail.html'
+class ContractorProfileView(DetailView):
+	model = User
+	template_name = 'accounts/contractors/detail.html'
 
 
-def logout_contractor(request):
-	try:
-		contractor = Contractor.objects.get(id=request.session['contractor_id'])
-		contractor.is_online = False
-		contractor.save()
-		del request.session['contractor_id']
-		# flush()
-	except KeyError:
-		pass
-	return HttpResponseRedirect('%s'%(reverse('accounts:main_contractor')))
+
+
+
 

@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .forms import CreateTaskForm, CreateBidForm, ChooseSubcategoryForm, SetAddressForm, AddTaskDetailsForm
 from .models import Task, Bid, BidSerializer, Location
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 # import datetime
@@ -115,7 +115,7 @@ class TaskDetailView(DetailView):
 		if request.method == 'POST':
 			if form.is_valid():
 				
-				contractor = Contractor.objects.get(id=request.session['contractor_id'])
+				contractor = User.objects.get(id=request.session['user_id'])
 				task = Task.objects.get(id=request.POST['task_id'])
 				bid_type = request.POST['bid_type']
 				amount = request.POST['amount']
@@ -166,7 +166,7 @@ def accept_bid(request):
 
 		task = Task.objects.get(id=task_id)
 		bid = Bid.objects.get(id=bid_id)
-		contractor = Contractor.objects.get(id=contractor_id)
+		contractor = User.objects.get(id=contractor_id)
 
 		task.contractor = contractor
 		task.task_status = 'Active'
