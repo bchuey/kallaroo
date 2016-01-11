@@ -17,8 +17,8 @@ class UserCreationForm(forms.ModelForm):
 	profile_pic = forms.ImageField(label='Profile Picture', widget=forms.ClearableFileInput(attrs={'class':'form-control'}))
 	password1 = forms.CharField(label='Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control'}))
 	password2 = forms.CharField(label='Confirm Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control'}))
-	is_contractor = forms.BooleanField(label='Are you a contrator?', required=False, widget=forms.CheckboxInput())
-	subcategory = forms.ModelChoiceField(label='Subcategory', queryset=Subcategory.objects.all(), widget=forms.Select(attrs={'class':'form-control'}))
+	is_contractor = forms.BooleanField(label='Are you a contractor?', required=False, widget=forms.CheckboxInput())
+	subcategory = forms.ModelChoiceField(label='Subcategory', queryset=Subcategory.objects.all(), widget=forms.Select(attrs={'class':'form-control'}), required=False)
 
 	class Meta:
 		model = User
@@ -38,21 +38,28 @@ class UserCreationForm(forms.ModelForm):
 			user.save()
 		return user
 
+# class UserAddressForm(forms.ModelForm):
+# 	STATE_CHOICES = (
+# 		('AZ', 'AZ'),
+# 		('CA', 'CA'),
+# 		('TX', 'TX'),
+# 	)
+# 	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control'}))
+# 	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control'}))
+# 	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control'}))
+# 	state = forms.ChoiceField(label='State', choices=STATE_CHOICES, widget=forms.Select(attrs={'class':'form-control'}))
+# 	zipcode = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control'}))
+
+# 	class Meta:
+# 		model = UserAddress
+# 		fields = ('street_number', 'street_address', 'city', 'state', 'zipcode')
+
 class UserAddressForm(forms.ModelForm):
-	STATE_CHOICES = (
-		('AZ', 'AZ'),
-		('CA', 'CA'),
-		('TX', 'TX'),
-	)
-	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control'}))
-	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control'}))
-	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control'}))
-	state = forms.ChoiceField(label='State', choices=STATE_CHOICES, widget=forms.Select(attrs={'class':'form-control'}))
-	zipcode = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control'}))
+	address = forms.CharField(label='ADDRESS', widget=forms.TextInput(attrs={'class':'form-control'}))
 
 	class Meta:
-		model = UserAddress
-		fields = ('street_number', 'street_address', 'city', 'state', 'zipcode')
+		model = User
+		fields = ['address']
 
 class UserChangeForm(forms.ModelForm):
 	username = forms.CharField(label='Username', max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))

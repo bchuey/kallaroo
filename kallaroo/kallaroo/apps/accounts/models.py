@@ -55,6 +55,9 @@ class User(AbstractBaseUser):
 	profile_pic = models.ImageField(null=True, blank=True)
 	subcategory = models.CharField(max_length=255, null=True, blank=True)
 
+	# address
+	address = models.CharField(max_length=255, null=True, blank=True)
+
 	# Braintree unique ID
 	braintree_id = models.CharField(max_length=255, null=True, blank=True)
 	braintree_client_token = models.CharField(max_length=2000, null=True, blank=True)

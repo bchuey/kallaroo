@@ -45,6 +45,12 @@ class RegisterProfileView(View):
 	def post(self, request, *args, **kwargs):
 
 		form = UserCreationForm(request.POST, request.FILES)
+
+		context = {
+			'form': form,
+		}
+
+		
 		if request.method == "POST":
 			if form.is_valid():
 
@@ -56,21 +62,18 @@ class RegisterProfileView(View):
 
 				user = User.objects.create_user(email, username, first_name, last_name, password)
 				user.profile_pic = request.FILES['profile_pic']
-				user.is_contractor = request.POST['is_contractor']
-				print(user.is_contractor)
-
-				user.subcategory = request.POST['subcategory']
+				
+				try:
+					user.is_contractor = request.POST['is_contractor']
+					user.subcategory = request.POST['subcategory']
+				except:
+					pass
 
 				user.braintree_id = user.get_braintree_id()
-				# print(user.braintree_id)
+
 				user.braintree_client_token = user.get_client_token()
-				# print(user.braintree_client_token)
 
 				user.save()
-
-				# print("=============")
-				# print("user registered successfully")
-				# print("=============")
 
 				user = authenticate(username=email, password=password)
 				print(user)
@@ -82,6 +85,7 @@ class RegisterProfileView(View):
 
 				return HttpResponseRedirect('%s'%(reverse('accounts:register_address')))
 			else:
+				print("uh oh, something went wrong")
 				return render(request, self.template_name, context)
 
 class RegisterAddressView(View):
@@ -104,17 +108,20 @@ class RegisterAddressView(View):
 		form = UserAddressForm(request.POST)
 		if request.method == "POST":
 			if form.is_valid():
-				street_number = request.POST['street_number']
-				street_address = request.POST['street_address']
-				city = request.POST['city']
-				state = request.POST['state']
-				zipcode = request.POST['zipcode']
+				# street_number = request.POST['street_number']
+				# street_address = request.POST['street_address']
+				# city = request.POST['city']
+				# state = request.POST['state']
+				# zipcode = request.POST['zipcode']
 
-				address = UserAddress.objects.create_address(street_number=street_number, street_address=street_address, city=city, state=state, zipcode=zipcode)
+				# address = UserAddress.objects.create_address(street_number=street_number, street_address=street_address, city=city, state=state, zipcode=zipcode)
 
+				# user = User.objects.get(id=request.session['user_id'])
+				# address.user = user
 				user = User.objects.get(id=request.session['user_id'])
-				address.user = user
-				address.save()
+				user.address = request.POST['address']
+				# address.save()
+				user.save()
 
 				return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
 			else:

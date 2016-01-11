@@ -1,12 +1,29 @@
 {% extends 'base.html' %}
 
 {% block jsblock %}
-	
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5rDIK5VhVda2tXaw-h28AvAObJhVeVfY&libraries=places"></script>
 {% endblock %}
 
 
 {% block jquery %}
-	
+	var input = document.getElementById('id_address');
+	var options = {
+	  types: ['address'],
+	  componentRestrictions: {country:'us'}
+	};
+	autocomplete = new google.maps.places.Autocomplete(input, options);
+
+	google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    var place = autocomplete.getPlace();
+    for (var i = 0; i < place.address_components.length; i++) {
+      for (var j = 0; j < place.address_components[i].types.length; j++) {
+        if (place.address_components[i].types[j] == "postal_code") {
+          document.getElementById('id_address').value += ("," + " " + place.address_components[i].long_name);
+
+        }
+      }
+    }
+  })
 {% endblock %}
 
 
@@ -36,12 +53,12 @@
 			<form action="{% url 'accounts:register_address' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
 				{% csrf_token %}
 				<div class="col-md-12 task-field-container">
-					{% for field in form %}
+
 						<div class="form-group">
-							{{ field.label }}
-							{{ field }}
+							{{ form.address.label }}
+							{{ form.address }}
 						</div>
-					{% endfor %}
+
 				</div>
 				<input type="submit" value="Continue" id="add_task" class="btn-blue btn-blue-effect col-xs-12" />
 			</form>

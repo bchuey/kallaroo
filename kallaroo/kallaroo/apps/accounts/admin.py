@@ -13,14 +13,15 @@ class UserAdmin(BaseUserAdmin):
 	form = UserChangeForm
 	add_form = UserCreationForm
 
-	list_display = ('id', 'email', 'username', 'first_name', 'last_name', 'is_admin')
+	list_display = ('id', 'email', 'username', 'first_name', 'last_name','is_contractor', 'is_admin')
 	list_filter = ('is_admin',)
 	fieldsets = (
 
-		(None, {'fields': ('email','username','password')}),
-		('Personal info', {'fields': ('first_name', 'last_name',)}),
+		('Account Info', {'fields': ('email','username','password')}),
+		('Personal Info', {'fields': ('first_name', 'last_name',)}),
 		('Permissions', {'fields': ('is_contractor', 'is_admin',)}),
-		('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')})
+		('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')}),
+		('Address', {'fields': ('address',)}),
 	)
 
 	add_fieldsets = (
