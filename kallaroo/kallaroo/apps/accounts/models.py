@@ -53,7 +53,7 @@ class User(AbstractBaseUser):
 	is_online = models.BooleanField(default=False)
 	is_contractor = models.BooleanField(default=False)
 	profile_pic = models.ImageField(null=True, blank=True)
-	subcategory = models.CharField(max_length=255, null=True, blank=True)
+	subcategory = models.ForeignKey(Subcategory, max_length=255, null=True, blank=True)
 
 	# address
 	address = models.CharField(max_length=255, null=True, blank=True)

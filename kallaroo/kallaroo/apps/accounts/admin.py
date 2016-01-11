@@ -22,6 +22,7 @@ class UserAdmin(BaseUserAdmin):
 		('Permissions', {'fields': ('is_contractor', 'is_admin',)}),
 		('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')}),
 		('Address', {'fields': ('address',)}),
+		('Subcategory', {'fields': ('subcategory',)}),
 	)
 
 	add_fieldsets = (
