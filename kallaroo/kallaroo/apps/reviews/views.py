@@ -40,6 +40,7 @@ class AddTaskRating(CreateView):
 
 
 
+
 # class AddContractorReview(CreateView):
 # 	model = Review
 # 	template_name = 'reviews/create_contractor_review.html'

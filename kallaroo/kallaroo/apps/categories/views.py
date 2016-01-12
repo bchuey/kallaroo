@@ -5,7 +5,7 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from ..tasks.models import Task
-
+from ..accounts.models import User
 
 # Create your views here.
 
@@ -20,7 +20,7 @@ class SubcategoryDetailView(DetailView):
 	def get_context_data(self, **kwargs):
 		context = super(SubcategoryDetailView, self).get_context_data(**kwargs)
 		context['tasks'] = Task.objects.filter(subcategory=self.object)
-		# context['contractors'] = ContractorProfile.objects.filter(subcategory=self.object)
+		context['contractors'] = User.objects.filter(is_contractor=True).filter(subcategory=self.object)
 		return context
 
 class SubcategoryTaskDetailView(DetailView):
@@ -38,5 +38,5 @@ class SubcategoryContractorDetailView(DetailView):
 
 	def get_context_data(self, **kwargs):
 		context = super(SubcategoryContractorDetailView, self).get_context_data(**kwargs)
-		# context['contractors'] = ContractorProfile.objects.filter(subcategory=self.object)
+		context['contractors'] = User.objects.filter(is_contractor=True).filter(subcategory=self.object)
 		return context

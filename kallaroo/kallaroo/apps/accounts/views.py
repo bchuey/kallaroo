@@ -82,7 +82,8 @@ class RegisterProfileView(View):
 				print("user logged in")
 				print("=============")
 				request.session['user_id'] = user.id
-
+				user.is_online = True
+				user.save()
 				return HttpResponseRedirect('%s'%(reverse('accounts:register_address')))
 			else:
 				print("uh oh, something went wrong")
@@ -261,6 +262,8 @@ def login_user(request):
 				
 				print(request.session.session_key)
 				# return HttpResponseRedirect('/accounts/success')
+				user.is_online = True
+				user.save()
 				return HttpResponseRedirect('%s'%(reverse('accounts:dashboard',args=[request.session['user_id']])))
 			else:
 				return HttpResponseRedirect('%s'%(reverse('accounts:main')))
@@ -270,6 +273,8 @@ def login_user(request):
 		return HttpResponseRedirect('%s'%(reverse('accounts:main')))
 
 def logout_view(request):
+	user = User.objects.get(id=request.session['user_id'])
+	user.is_online = False
 	logout(request)
 	print("=============")
 	print("user logged out successfully")
