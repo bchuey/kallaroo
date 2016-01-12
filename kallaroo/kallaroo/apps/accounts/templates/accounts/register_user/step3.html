@@ -40,7 +40,7 @@
 <div class="row section-light-gray border-top-gray">
 	<div class="container" id="task-form-container">
 		<div class="col-md-12">
-			<form action="{% url 'accounts:register-payment' %}" method="POST">
+			<form action="{% url 'accounts:register_payment' %}" method="POST">
 				{% csrf_token %}
 			  <div id="dropin-container"></div>
 			  <input type="submit" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />

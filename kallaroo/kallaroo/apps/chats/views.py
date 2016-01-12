@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 from .models import Chatroom, Chat, ChatSerializer
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, JsonResponse
@@ -49,12 +49,13 @@ def create_chatroom(request):
 	"""
 	if request.method == "POST":
 		user_id = request.POST['user_id']
-		user = User.objects.get(id=user_id)
+		creator = User.objects.get(id=user_id)
 
-		contractor_id = request.POST['contractor_id']
-		contractor = Contractor.objects.get(id=contractor_id)
+		# contractor_id = request.POST['contractor_id']
+		# contractor = Contractor.objects.get(id=contractor_id)
+		participant = User.objects.get(id=request.POST['contractor_id'])
 
-		chatroom = Chatroom.objects.create(creator=user, participant=contractor)
+		chatroom = Chatroom.objects.create(creator=creator, participant=participant)
 
 		# redirect to the chatroom, pass in the id of that chatroom in args=[chatroom.id]
 		# return HttpResponse("everything worked")

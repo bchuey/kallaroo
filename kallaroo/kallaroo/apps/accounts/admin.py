@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
-from .models import User, Contractor, ContractorProfile, UserAddress
+from .models import User, UserAddress
 from .forms import UserCreationForm, UserChangeForm
 
 # Register your models here.
@@ -13,14 +13,16 @@ class UserAdmin(BaseUserAdmin):
 	form = UserChangeForm
 	add_form = UserCreationForm
 
-	list_display = ('email', 'username', 'first_name', 'last_name', 'is_admin')
+	list_display = ('id', 'email', 'username', 'first_name', 'last_name','is_contractor', 'is_admin')
 	list_filter = ('is_admin',)
 	fieldsets = (
 
-		(None, {'fields': ('email','username','password')}),
-		('Personal info', {'fields': ('first_name', 'last_name',)}),
-		('Permissions', {'fields': ('is_admin',)}),
-		('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')})
+		('Account Info', {'fields': ('email','username','password')}),
+		('Personal Info', {'fields': ('first_name', 'last_name',)}),
+		('Permissions', {'fields': ('is_contractor', 'is_admin',)}),
+		('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')}),
+		('Address', {'fields': ('address',)}),
+		('Subcategory', {'fields': ('subcategory',)}),
 	)
 
 	add_fieldsets = (
@@ -38,20 +40,5 @@ class UserAdmin(BaseUserAdmin):
 		UserAddressInline,
 	]
 
-class ContractorProfileInline(admin.StackedInline):
-
-	model = ContractorProfile
-	extra = 1
-
-
-class ContractorAdmin(admin.ModelAdmin):
-
-	list_display = ['id','username', 'email', 'first_name', 'last_name', 'is_online', 'is_active']
-	model = Contractor
-	inlines = [
-		ContractorProfileInline,
-	]
-
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
-admin.site.register(Contractor, ContractorAdmin)

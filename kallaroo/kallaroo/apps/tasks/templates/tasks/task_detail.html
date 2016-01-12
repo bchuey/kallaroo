@@ -139,7 +139,7 @@
 				<!-- google map goes here -->
 			</div>
 		</div>
-		{% if request.user.is_contractor != False %}
+		{% if request.user.is_contractor %}
 		<div class="col-md-12">
 			<form action="{% url 'tasks:task_detail' object.id %}" method="POST" class="col-md-6">
 				{% csrf_token %}
@@ -149,7 +149,7 @@
 			</form>
 		</div>
 		{% endif %}
-		{% if 'contractor_id' not in request.session %}
+		{% if not request.user.is_contractor %}
 		<div class="col-md-12">
 			{% if bids %}
 				<h3>Bids:</h3>
