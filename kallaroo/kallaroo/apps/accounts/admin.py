@@ -23,6 +23,7 @@ class UserAdmin(BaseUserAdmin):
 		('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')}),
 		('Address', {'fields': ('address',)}),
 		('Subcategory', {'fields': ('subcategory',)}),
+		('Sockets', {'fields': ('socket_id',)}),
 	)
 
 	add_fieldsets = (

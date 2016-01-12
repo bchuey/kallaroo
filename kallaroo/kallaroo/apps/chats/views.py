@@ -73,11 +73,7 @@ def create_chatroom(request):
 def send_message(request):
 
 	if request.method == "POST":
-		# try:
-			# grab the author through session_key
-			# session = Session.objects.get(session_key=request.POST.get('sessionid'))
-			# user_id = session.get_decoded().get('_auth_user_id')
-			# user = User.objects.get(id=user_id)
+
 		user = User.objects.get(id=request.POST.get('user_id'))
 		chatroom = Chatroom.objects.get(id=request.POST.get('chatroom_id'))
 

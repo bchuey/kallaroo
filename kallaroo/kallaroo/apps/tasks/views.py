@@ -78,7 +78,26 @@ class AddTaskWizard(NamedUrlSessionWizardView):
 
 		new_task.save()
 
-		return HttpResponseRedirect('/tasks')
+		"""
+		Redis Notifications
+		"""
+		r = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+
+		context = user.username + " posted a new task in " + new_task.subcategory.title
+		
+		# channel = new_task.subcategory.title + "_channel"
+		channel = "new_task_1"
+		# print("the redis channel is: " + channel)
+		print context
+		
+		"""
+		Why isn't this publishing?
+		"""
+
+		r.publish(channel, context)
+
+
+		return HttpResponseRedirect('%s'%(reverse('tasks:task_list')))
 
 
 class SuccessView(TemplateView):
@@ -142,6 +161,7 @@ class TaskDetailView(DetailView):
 				context = BidSerializer(bid)
 				context = context.data
 				print context['amount'] 		# we can access the amounts like this on the server-side
+
 				r.publish(channel, context)
 
 				print("bid submitted")

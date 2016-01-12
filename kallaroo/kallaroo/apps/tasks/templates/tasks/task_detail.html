@@ -50,6 +50,7 @@
 			
 {% endblock %}
 {% block sockets %}
+	
 	// Realtime notifications
 	// Get the session of the logged in contractor (?)
 	var socket = io.connect('http://127.0.0.1:3000');
@@ -70,36 +71,7 @@
 
 
 
-	// when accept button is clicked
-	$(".accept-bid").click(function(){
-		
-		var user_id = {{ request.user.id }};
 
-		// set task_id equal to the value of input id of task_id
-		var task_id = {{ object.id }};
-
-		// set contractor equal to the contractor of selected bid
-		// might have to use some more jQuery here to grab that information
-		// OR we can grab it in the views.py by querying Task.final_bid.contractor.id
-		var contractor_id = 1;
-
-		// emit a socket named 'notification' passing through task_id and contractor_id
-
-		socket.emit("notification", {
-			user_id: user_id, 
-			task_id: task_id, 
-			contractor_id : contractor_id,
-		});
-
-		// listen to 'send_notification' and do something
-		socket.on("send_notification", function(response){
-			$("#responseOutput").append("<p>we got a response</p>");
-			console.log("success, we can grab the response");
-		});
-
-		// if you return false; "we got a response" is appended and page doesn't refresh, but the accept button doesn't get the disable attribute
-
-	});
 {% endblock %}
 {% block navbar %}
 <div id="confirmation-message" class="row">

@@ -1,8 +1,41 @@
 {% extends 'base.html' %}
+{% block jsblock %}
+  <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+
+{% endblock %}
+{% block jquery %}
+
+{% endblock %}
+
+{% block sockets %}
+	var socket = io.connect('http://127.0.0.1:3000');
+
+	socket.on('message', function(context){
+		console.log("goodbye");
+		console.log(context);
+		$("#confirmation-message").append("<div class='alert alert-success text-center' role='alert'>" + context + "</div>");
+	});
+
+
+{% endblock %}
+
+
+
 {% block navbar %}
+<div id="confirmation-message" class="row">
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }} text-center" role="alert">
+			{{ message }}
+		</div>
+		{% endfor %}
+	{% endif %}
+</div>
+<div class="row">
 	<div class="container">
 		{% include 'navbar.html' %}
 	</div>
+</div>
 {% endblock %}
 {% block content %}
 <div class="row section-light-gray">

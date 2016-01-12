@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block jsblock %}
+<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
 {% endblock %}
 
 {% block jquery %}
@@ -15,7 +16,17 @@
 		console.log(clientToken);
 
 {% endblock %}
+{% block sockets %}
+	var socket = io.connect('http://127.0.0.1:3000');
 
+	$("#complete_registration").on("click", function(){
+			var user_id = {{ user.id }};
+			socket.emit('assign-socket-id', {user_id:user_id});
+
+
+	});
+
+{% endblock %}
 
 {% block navbar %}
 	<div class="container">
@@ -43,7 +54,7 @@
 			<form action="{% url 'accounts:register_payment' %}" method="POST">
 				{% csrf_token %}
 			  <div id="dropin-container"></div>
-			  <input type="submit" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
+			  <input type="submit" id="complete_registration" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
 			</form>
 			
 		</div>

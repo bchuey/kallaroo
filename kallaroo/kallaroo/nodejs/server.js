@@ -130,34 +130,36 @@ io.sockets.on('connection', function(socket){
 
 	
 
-	
+	/*
+	======================
+	Realtime Notifications
+	======================
+	*/
+	socket.on('assign-socket-id', function(data){
 
+		// get the socket.id
+		// run a $.post request
+		// send the socket.id in that POST request
+		// on the backend, assign it to request.user and create a request.session['socket_id']
+		// if 'socket_id' in request.session
+		// should only assign request.session['socket_id'] after login() occurs 
+		// don't run the .POST everytime the User goes to the dashboard page
 
-
-
-	// listen to socket event named 'notification'
-	socket.on('notification', function(data){
-
-		// Grab the data from client-side after the 'accept' button is clicked
+		//console.log(data.user_id);
+		var socket_id = socket.id;
 		var user_id = data.user_id;
-		var task_id = data.task_id;
-		var contractor_id = data.contractor_id;
 
-		// Put all that data in a new object
 		var postData = querystring.stringify({
+			socket_id: socket_id,
 			user_id: user_id,
-			task_id: task_id,
-			contractor_id: contractor_id,
 		});
-
-
-		/***** POST request for NOTIFICATION *****/
 
 		var options = {
 		  hostname: '127.0.0.1',
 		  port: 8000,
 		  // must remove the trailing slash from path url & url in urls.py
-		  path: '/notifications/send-notification',
+		  // path: '/accounts/' + user_id + '/dashboard/',
+		  path: '/accounts/assign-socket-id',
 		  method: 'POST',
 		  headers: {
 		    'Content-Type': 'application/x-www-form-urlencoded',
@@ -187,9 +189,87 @@ io.sockets.on('connection', function(socket){
 		req.write(postData);
 		req.end();
 
+	});
+
+	
+	/* POST request for LOGIN */
+	socket.on('assign-socket-id-after-login', function(){
+		var socket_id = socket.id;
+		var postData = querystring.stringify({
+			socket_id: socket_id,
+		});
+
+		var options = {
+		  hostname: '127.0.0.1',
+		  port: 8000,
+		  // change the path to match login_user
+		  path: '/accounts/assign-socket-id',
+		  method: 'POST',
+		  // need to send the CSRF_TOKEN through again
+		  headers: {
+		    'Content-Type': 'application/x-www-form-urlencoded',
+		    'Content-Length': postData.length
+		  }
+		};
+
+		var req = http.request(options, function(res) {
+		  // console.log('STATUS: ' + res.statusCode);
+		  // console.log('HEADERS: ' + JSON.stringify(res.headers));
+		  res.setEncoding('utf8');
+		  res.on('data', function (chunk) {
+		  	// JsonResponse returned by the view
+		    console.log(chunk);
+
+		  });
+		  res.on('end', function() {
+		    console.log('No more data in response.')
+		  })
+		});
+
+		req.on('error', function(e) {
+		  console.log('problem with request: ' + e.message);
+		});
+
+		// write data to request body
+		req.write(postData);
+		req.end();
 
 	});
 
+
+	/*
+	===========================
+	Notifications for New Task
+	===========================
+	*/
+
+	// var client1 = redis.createClient();
+	// socket.on('auction-number', function(data){
+	// 	var channel1 = "auction"+data.task_id;
+	// 	console.log("auction id is: " + channel1);
+	// 	client1.subscribe(channel1);
+	// })
+
+	// client1.on('message', function(channel1, bid){
+	// 	socket.send(bid);
+	// });
+
+	
+	var task1 = redis.createClient();
+	socket.on('new_task_added', function(data){
+		// var msg = "A new task has been added.";
+		console.log("new task has been added");
+		// var taskChannel = data.subcategory + "_channel";
+		var taskChannel = "new_task_1"
+		console.log("this is the channel: " + taskChannel);
+		task1.subscribe(taskChannel);
+
+	});
+
+	task1.on('message', function(taskChannel, notification){
+		socket.send(notification);
+		console.log("sending message: " + notification);
+	});
 
 });
 

@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 import braintree
 
 braintree.Configuration.configure(braintree.Environment.Sandbox,
@@ -62,10 +63,11 @@ class RegisterProfileView(View):
 
 				user = User.objects.create_user(email, username, first_name, last_name, password)
 				user.profile_pic = request.FILES['profile_pic']
-				
+
 				try:
 					user.is_contractor = request.POST['is_contractor']
-					user.subcategory = request.POST['subcategory']
+					subcategory = Subcategory.objects.get(id=request.POST['subcategory'])
+					user.subcategory = subcategory
 				except:
 					pass
 
@@ -138,6 +140,7 @@ class RegisterPaymentView(View):
 		braintree_client_token = user.braintree_client_token
 		context = {
 			'braintree_client_token': braintree_client_token,
+			'user': user,
 		}
 
 		return render(request, self.template_name, context)
@@ -206,6 +209,7 @@ class UserTaskView(View):
 		return render(request, self.template_name, context)
 
 @method_decorator(login_required, name='dispatch')
+# @csrf_protect
 class DashboardTemplateView(TemplateView):
 	template_name = 'accounts/dashboard.html'
 
@@ -213,6 +217,25 @@ class DashboardTemplateView(TemplateView):
 		context = super(DashboardTemplateView, self).get_context_data(**kwargs)
 		context['user'] = User.objects.get(id=self.request.session['user_id'])
 		return context
+
+@csrf_exempt
+def assign_socket_id(request):
+	if request.method == "POST":
+		if 'socket_id' not in request.session:
+			request.session['socket_id'] = request.POST.get('socket_id')
+			user = User.objects.get(id=request.POST.get('user_id'))
+			# user = request.user
+			user.socket_id = request.POST.get('socket_id')
+			user.save()
+			print("your session socket id is: " + request.session['socket_id'])
+			print("your socket id is: " + user.socket_id)
+			print("current user is: " + user.username)
+			return user
+		else:
+			user = User.objects.get(id=request.POST.get('user_id'))
+			# user = request.user
+			request.session['socket_id'] = user.socket_id
+			return user
 
 class UsersListView(ListView):
 	model = User
@@ -244,7 +267,7 @@ def login_user(request):
 		AuthenticationForm uses id_username;
 		username is dependent on USERNAME_FIELD in models;
 
-		If you use custom LoginForm with id_email, set authenticate(username=email) (???)
+		If you use custom LoginForm with id_email, set authenticate(username=email)
 		"""
 		email = request.POST['email']
 		password = request.POST['password']
@@ -259,7 +282,6 @@ def login_user(request):
 				print("=============")
 				request.session['user_id'] = user.id
 				print("sessionid is: ")
-				
 				print(request.session.session_key)
 				# return HttpResponseRedirect('/accounts/success')
 				user.is_online = True
@@ -275,11 +297,19 @@ def login_user(request):
 def logout_view(request):
 	user = User.objects.get(id=request.session['user_id'])
 	user.is_online = False
+	if 'socket_id' in request.session:
+		del request.session['socket_id']
+
+	if 'user_id' in request.session:
+		del request.session['user_id']
+
+	user.socket_id = None
+
 	logout(request)
 	print("=============")
 	print("user logged out successfully")
 	print("=============")
-	return HttpResponseRedirect('/accounts')
+	return HttpResponseRedirect('%s'%(reverse('accounts:main')))
 
 class SuccessView(TemplateView):
 	template_name = 'accounts/success.html'

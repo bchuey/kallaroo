@@ -34,18 +34,15 @@
 
 	socket.on('message', function(context){
 
-
 		console.log(context);
 
-		var obj = jQuery.parseJSON(context);
-		console.log(obj);
+		//var obj = jQuery.parseJSON(context);
+		//console.log(obj);
+		
 		$("#chats").append("<p>" + context + "</p>");
 		
 	});
 
-	// socket.on('response-message', function(message){
-		// console.log(message);
-	// });
 
 	/*
 	$('#chats').append("<div class='media'><div class='media-left'><span class='glyphicon glyphicon-user glyphicon-lg'></span></div><div class='media-body'><div class='well'><h4>" + author + "<span class='pull-right'>" + written_at + "</span></h4><p>" + msg + "</p></div></div></div>");
