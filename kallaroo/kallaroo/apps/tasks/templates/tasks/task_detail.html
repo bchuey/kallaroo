@@ -57,11 +57,6 @@
 	var task_id = {{ object.id }};
 	socket.emit("auction-number", {task_id:task_id});
 
-	// submit bid form
-	$("#").click(function(){
-
-		
-	});
 
 	socket.on('message', function(context){
 
@@ -151,9 +146,10 @@
 		{% endif %}
 		{% if not request.user.is_contractor %}
 		<div class="col-md-12">
-			{% if bids %}
-				<h3>Bids:</h3>
-				<div id="bid-wrapper" class="row col-md-12">
+			
+			<h3>Bids:</h3>
+			<div id="bid-wrapper" class="row col-md-12">
+			{% if bids %}	
 				{% for bid in bids %}
 				<div class="thumbnail col-md-4">
 					<div class="caption">

@@ -11,13 +11,14 @@ urlpatterns = [
 	url(r'^register/payment/$', views.RegisterPaymentView.as_view(), name='register_payment'),
 
 
-
+	url(r'^$', views.AccountView.as_view(), name='main'),
+	
 	# url(r'^register/(?P<step>\w+)/$', account_wizard, name='register_step'),
 
 	url(r'^(?P<pk>\d+)/tasks/$', views.UserTaskView.as_view(), name='my_tasks'),
 	url(r'^(?P<pk>\d+)/profile/$', views.UserProfileDetailView.as_view(), name='profile'),
 	url(r'^(?P<pk>\d+)/dashboard/$', views.DashboardTemplateView.as_view(), name='dashboard'),
-	url(r'^$', views.AccountView.as_view(), name='main'),
+	
 
 	url(r'^login/$', views.login_user, name='login'),
 	url(r'^success/$', views.SuccessView.as_view(), name='success'),

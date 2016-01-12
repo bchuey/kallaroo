@@ -263,11 +263,11 @@ def login_user(request):
 				# return HttpResponseRedirect('/accounts/success')
 				return HttpResponseRedirect('%s'%(reverse('accounts:dashboard',args=[request.session['user_id']])))
 			else:
-				return render(request, 'accounts/index.html', context)
+				return HttpResponseRedirect('%s'%(reverse('accounts:main')))
 		else:
-			return render(request, 'accounts/index.html', context)
+			return HttpResponseRedirect('%s'%(reverse('accounts:main')))
 	else:
-		return render(request, 'accounts/index.html', context)
+		return HttpResponseRedirect('%s'%(reverse('accounts:main')))
 
 def logout_view(request):
 	logout(request)
