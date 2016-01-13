@@ -19,7 +19,7 @@ from django.contrib import messages
 from django.conf import settings
 import redis
 import json
-import collections
+
 import braintree
 
 braintree.Configuration.configure(braintree.Environment.Sandbox,
@@ -28,17 +28,6 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
     private_key=settings.BRAINTREE_PRIVATE,
 )
 
-
-def _convert(data):
-    if isinstance(data, basestring):
-        return str(data)
-    elif isinstance(data, collections.Mapping):
-        return dict(map(_convert, data.iteritems()))
-    elif isinstance(data, collections.Iterable):
-        return type(data)(map(_convert, data))
-    else:
-        return data
-        
 
 """
 ==================
@@ -169,9 +158,7 @@ class TaskDetailView(DetailView):
 				context = BidSerializer(bid)
 				context = context.data
 
-				context = _convert(context)
 				context = json.dumps(context)
-				# print context['amount'] 		# we can access the amounts like this on the server-side
 
 				r.publish(channel, context)
 

@@ -16,17 +16,6 @@ from django.core import serializers
 import json
 import redis
 
-import collections
-
-def _convert(data):
-    if isinstance(data, basestring):
-        return str(data)
-    elif isinstance(data, collections.Mapping):
-        return dict(map(_convert, data.iteritems()))
-    elif isinstance(data, collections.Iterable):
-        return type(data)(map(_convert, data))
-    else:
-        return data
 
 @login_required
 def home(request):
@@ -106,10 +95,7 @@ def send_message(request):
 		context = ChatSerializer(chat)
 
 		context = context.data
-		print("==========")
-		print("convert w/o 'u' ")
-		print("==========")
-		context = _convert(context)
+
 		context = json.dumps(context)
 		print(context)
 
