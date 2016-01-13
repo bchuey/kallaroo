@@ -9,14 +9,14 @@
 {% block sockets %}
 	
 
-	// $("form").on("submit", function(){
+	$("form").on("submit", function(){
 
-			// var socket = io.connect('http://127.0.0.1:3000');
-			// var user_id = {{ user.id }};
-			// socket.emit('assign-socket-id-after-login', {});
+		var socket = io.connect('http://127.0.0.1:3000');
+		// var user_id = {{ user.id }};
+		// socket.emit('assign-socket-id-after-login', {});
+		socket.emit('join_room', {});
 
-
-	// });
+	});
 
 {% endblock %}
 

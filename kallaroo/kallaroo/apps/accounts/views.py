@@ -28,6 +28,7 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
 )
 
 
+
 class RegisterProfileView(View):
 	model = User
 	form = UserCreationForm

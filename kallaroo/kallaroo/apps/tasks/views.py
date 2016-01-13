@@ -18,7 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.conf import settings
 import redis
-
+import json
+import collections
 import braintree
 
 braintree.Configuration.configure(braintree.Environment.Sandbox,
@@ -27,6 +28,17 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
     private_key=settings.BRAINTREE_PRIVATE,
 )
 
+
+def _convert(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(_convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(_convert, data))
+    else:
+        return data
+        
 
 """
 ==================
@@ -89,10 +101,6 @@ class AddTaskWizard(NamedUrlSessionWizardView):
 		channel = "new_task_1"
 		# print("the redis channel is: " + channel)
 		print context
-		
-		"""
-		Why isn't this publishing?
-		"""
 
 		r.publish(channel, context)
 
@@ -160,7 +168,10 @@ class TaskDetailView(DetailView):
 
 				context = BidSerializer(bid)
 				context = context.data
-				print context['amount'] 		# we can access the amounts like this on the server-side
+
+				context = _convert(context)
+				context = json.dumps(context)
+				# print context['amount'] 		# we can access the amounts like this on the server-side
 
 				r.publish(channel, context)
 

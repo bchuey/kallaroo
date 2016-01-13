@@ -10,9 +10,23 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 # from redis_collections import Dict
-from django.core import serializers
+from django.utils.encoding import smart_text
 
+from django.core import serializers
+import json
 import redis
+
+import collections
+
+def _convert(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(_convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(_convert, data))
+    else:
+        return data
 
 @login_required
 def home(request):
@@ -89,25 +103,20 @@ def send_message(request):
 		# is this the chatroom part?
 		r = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
 
-		# context = {
-		# 	'author': chat.author.username,
-		# 	'msg': chat.text,
-		# 	'written_at': chat.written_at,
-		# }
-
-		# select_related
-		
-
-		# query = Chat.objects.select_related('author').filter(id=chat.id)
-
 		context = ChatSerializer(chat)
 
-		# print(context.data)
 		context = context.data
+		print("==========")
+		print("convert w/o 'u' ")
+		print("==========")
+		context = _convert(context)
+		context = json.dumps(context)
+		print(context)
 
 		r.publish(channel, context)
 
 		return HttpResponse("Everything worked!")
+
 
 
 

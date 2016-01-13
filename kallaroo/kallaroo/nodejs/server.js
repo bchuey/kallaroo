@@ -28,12 +28,13 @@ io.sockets.on('connection', function(socket){
 	// console.log('a user connected');
 	// console.log(socket.id);
 	// console.log("=============");
-	var sub = redis.createClient();
+	
 	/*
 	=================
 	Realtime for Chatrooms
 	=================
 	*/
+	var sub = redis.createClient();
 
 	socket.on('room-number', function(data){
 		// console.log(data.room_id);
@@ -253,6 +254,9 @@ io.sockets.on('connection', function(socket){
 	// client1.on('message', function(channel1, bid){
 	// 	socket.send(bid);
 	// });
+	socket.on('join_room', function(data){
+		socket.join('')
+	});
 
 	
 	var task1 = redis.createClient();
