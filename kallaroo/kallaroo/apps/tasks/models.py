@@ -82,7 +82,7 @@ from rest_framework import serializers
 class BidSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Bid
-		fields = ('contractor', 'task', 'bid_type', 'amount', 'estimated_hours')
+		fields = ('id', 'contractor', 'task', 'bid_type', 'amount', 'estimated_hours')
 		depth = 1
 
 
