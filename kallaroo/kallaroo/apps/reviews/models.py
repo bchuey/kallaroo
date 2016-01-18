@@ -15,7 +15,7 @@ class Review(models.Model):
 	can either write a review for the contractor or specific task
 	"""
 	user = models.ForeignKey(User, null=True, blank=True, related_name='client_reviewer')
-	contractor = models.ForeignKey(User, null=True, blank=True, related_name='contractor_reviewer')
+	# contractor = models.ForeignKey(User, null=True, blank=True, related_name='contractor_reviewer')
 	task = models.ForeignKey(Task, null=True, blank=True)
 
 	class Meta:
@@ -31,7 +31,7 @@ class Rating(models.Model):
 	can either write a review for the contractor or specific task
 	"""
 	user = models.ForeignKey(User, null=True, blank=True, related_name='client_rater')
-	contractor = models.ForeignKey(User, null=True, blank=True, related_name='contractor_rater')
+	# contractor = models.ForeignKey(User, null=True, blank=True, related_name='contractor_rater')
 	task = models.ForeignKey(Task, null=True, blank=True)
 
 	class Meta:
