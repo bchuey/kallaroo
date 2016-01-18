@@ -341,7 +341,7 @@ class CompletedTaskListView(ListView):
 
 	def get(self, request, *args, **kwargs):
 		user = User.objects.get(id=request.session['user_id'])
-		tasks = Task.objects.filter(user=user).filter(task_status="Completed")
+		tasks = Task.objects.filter(user=user).filter(task_status="Paid")
 		context = {
 			'tasks': tasks,
 		}

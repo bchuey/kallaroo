@@ -191,7 +191,7 @@
 					<p>{{ review.comment }}</p>
 				</div>
 				{% endfor %}
-
+				{% if not request.user.is_contractor %}
 				<div class="row">
 					<div id="add_review" class="col-md-12">
 						<form action="{% url 'reviews:create_review' %}" method="POST" class="col-md-6">
@@ -214,7 +214,7 @@
 						<button id="add_review_btn" class="btn-blue btn-blue-effect">Add Review</button>
 					</div>
 				</div>
-
+				{% endif %}
 			</div>
 		</div>
 	</div>
