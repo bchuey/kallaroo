@@ -112,19 +112,24 @@
 {% block content %}
 <div class="row section-static border-top-gray">
 	<div class="container">
-		<div class="col-md-8 col-md-push-2 ">
-			<h3>You have been matched with: <img src="#" class="" alt="" /></h3>
+		<div class="col-md-8 col-md-push-2 text-center">
+			<h3>You have been matched with: </h3>
+			<img src="#" class="" alt="" />
+			<h3>{{ contractor.first_name }} {{ contractor.last_name }}</h3>
 		</div>
 	</div>
 </div>
 <div class="row section-static border-top-gray">
 	<div class="container">
-		<div class="col-md-2">
-			<img src="#" class="" alt="" />
-		</div>
 		<div class="col-md-7">
-			<h3 class="no-padding no-margin">{{ contractor.first_name }} {{ contractor.last_name }}</h3>
-
+			<div class="col-md-4">
+				<h4>Estimated Hours</h4>
+				<h4><small>{{ object.final_bid.estimated_hours }}</small></h4>
+			</div>
+			<div class="col-md-4">
+				<h4>Hourly Rate</h4>
+				<h4><small>{{ object.final_bid.amount }}</small></h4>
+			</div>
 		</div>
 		<div id="confirmation" class="col-md-3">
 			{% if object.task_status == "Active" and object.task_clock_in == None %}
