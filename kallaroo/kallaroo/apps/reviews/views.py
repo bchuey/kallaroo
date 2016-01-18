@@ -7,64 +7,33 @@ from django.views.generic.edit import CreateView
 from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 # Create your views here.
-class AddTaskReview(CreateView):
-	model = Review
-	template_name = 'reviews/create_task_review.html'
-	form = CreateReviewForm
-	fields = ('comment', 'rating')
-	success_url = '/tasks'
+def add_review(request):
+	form = CreateReviewForm(request.POST or None)
+	if request.method == "POST":
+		# if form.is_valid():
+		author = request.user
+		try:
+			reviewee = User.objects.get(id=request.POST['reviewee_id'])
+		except:
+			pass
+		comment = request.POST['comment']
+		rating = request.POST['rating']
+		task = Task.objects.get(id=request.POST['task_id'])
 
-	"""
-	1.) ASSIGNING the author to request.user
-	2.) PASSING the url parameter to be used to fetch specific task 
-	"""
-	def form_valid(self, form):
-		form.instance.author = self.request.user
-		form.instance.task = Task.objects.get(pk=self.kwargs['task_id'])
-		return super(AddTaskReview, self).form_valid(form)
+		new_review = Review()
+		new_review.author = author
+		try:
+			new_review.reviewee = reviewee
+		except: 
+			pass
+		new_review.comment = comment
+		new_review.rating = rating
+		new_review.task = task
 
+		new_review.save()
 
-class AddTaskRating(CreateView):
-	model = Rating
-	template_name = 'reviews/create_task_rating.html'
-	form = CreateRatingForm
-	fields = ('value')
-	success_url = '/tasks'
-
-	def form_valid(self, form):
-		form.instance.author = self.request.user
-		form.instance.task = Task.objects.get(pk=self.kwargs['task_id'])
-		return super(AddTaskRating, self).form_valid(form)
-
-
-
-
-# class AddContractorReview(CreateView):
-# 	model = Review
-# 	template_name = 'reviews/create_contractor_review.html'
-# 	form = CreateReviewForm
-# 	fields = ('comment', 'rating')
-# 	success_url = '/tasks'
-
-# 	"""
-# 	1.) ASSIGNING the author to request.user
-# 	2.) PASSING the url parameter to be used to fetch specific contractor 
-# 	"""
-# 	def form_valid(self, form):
-# 		form.instance.author = self.request.user
-# 		form.instance.contractor = Contractor.objects.get(pk=self.kwargs['contractor_id'])
-# 		return super(AddContractorReview, self).form_valid(form)
-
-# class AddContractorRating(CreateView):
-# 	model = Rating
-# 	template_name = 'reviews/create_contractor_rating.html'
-# 	form = CreateRatingForm
-# 	fields = ('value')
-# 	success_url = '/tasks'
-
-# 	def form_valid(self, form):
-# 		form.instance.author = self.request.user
-# 		form.instance.contractor = Contractor.objects.get(pk=self.kwargs['contractor_id'])
-# 		return super(AddContractorRating, self).form_valid(form)
+		return HttpResponseRedirect('%s'%(reverse('tasks:task_detail', args=[task.id])))

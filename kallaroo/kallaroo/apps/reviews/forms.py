@@ -11,7 +11,7 @@ RATING_CHOICES = (
 
 )
 class CreateReviewForm(forms.ModelForm):
-	comment = forms.CharField(label='Review', widget=forms.Textarea(attrs={'class':'form-control', 'placeholder':'Tell us about your experience...'}))
+	comment = forms.CharField(label='Comment', widget=forms.Textarea(attrs={'class':'form-control', 'placeholder':'Tell us about your experience...'}))
 	rating = forms.ChoiceField(label='Rating', widget=forms.Select(attrs={'class':'form-control'}), choices=RATING_CHOICES)
 
 	class Meta:

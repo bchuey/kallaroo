@@ -47,7 +47,9 @@
 
 	}
 
-			
+	$("#add_review_btn").on("click", function(){
+		$("#add_review").append()
+	});
 {% endblock %}
 {% block sockets %}
 	
@@ -183,17 +185,36 @@
 			<div class="col-md-12">
 				<h3>Reviews</h3>
 				{% for review in object.review_set.all %}
+				<div class="well col-md-8">
 					<p>written by: {{ review.author }} | written on: {{ review.posted_at }}</p>
 					<p>{{ review.rating }}</p>
 					<p>{{ review.comment }}</p>
+				</div>
 				{% endfor %}
-				{% if not request.user %}
+
 				<div class="row">
+					<div id="add_review" class="col-md-12">
+						<form action="{% url 'reviews:create_review' %}" method="POST" class="col-md-6">
+						{% csrf_token %}
+						<input type="hidden" id="task_id" name="task_id" value="{{ object.id }}" />
+						{% for field in review_form %}
+						<div class="form-group">
+							{{ field.label }}
+							{{ field}}
+						</div>
+						{% endfor %}
+						<div class="form-group">
+							<input type="submit" value="Submit Review" class="btn-orange btn-orange-effect"/>
+						</div>
+						</form>
+					</div>
+
 					<div class="col-md-12">
-						<a href="{% url 'reviews:add-task-review' object.id %}" class="btn-blue btn-blue-effect">Add Review</a>
+					<hr>
+						<button id="add_review_btn" class="btn-blue btn-blue-effect">Add Review</button>
 					</div>
 				</div>
-				{% endif %}
+
 			</div>
 		</div>
 	</div>

@@ -8,6 +8,7 @@ from django.views.generic.detail import DetailView
 from .forms import CreateTaskForm, CreateBidForm, ChooseSubcategoryForm, SetAddressForm, AddTaskDetailsForm
 from .models import Task, Bid, BidSerializer, Location
 from ..accounts.models import User
+from ..reviews.forms import CreateReviewForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 # import datetime
@@ -119,6 +120,7 @@ class TaskDetailView(DetailView):
 		context = super(TaskDetailView, self).get_context_data(**kwargs)
 		context['bid_form'] = self.form()
 		context['bids'] = self.object.bid_set.all()
+		context['review_form'] = CreateReviewForm
 		try:
 			context['location'] = Location.objects.get(task=self.object)
 		except:

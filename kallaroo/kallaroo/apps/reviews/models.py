@@ -7,15 +7,21 @@ from ..tasks.models import Task, Bid
 # Create your models here.
 
 class Review(models.Model):
-	author = models.ForeignKey(User, related_name='review_author')
+	RATING_CHOICES = (
+
+		('1', '1'),
+		('2', '2'),
+		('3', '3'),
+		('4', '4'),
+		('5', '5'),
+
+	)
+	author = models.ForeignKey(User, related_name='author')
+	reviewee = models.ForeignKey(User, null=True, blank=True, related_name='reviewee')
 	comment = models.TextField()
 	posted_at = models.DateTimeField(auto_now_add=True, auto_now=False)
-	rating = models.IntegerField(null=True, blank=True)
-	"""
-	can either write a review for the contractor or specific task
-	"""
-	user = models.ForeignKey(User, null=True, blank=True, related_name='client_reviewer')
-	# contractor = models.ForeignKey(User, null=True, blank=True, related_name='contractor_reviewer')
+	# rating = models.OneToOneField('Rating', null=True, blank=True)
+	rating = models.IntegerField(default=1, choices=RATING_CHOICES, blank=True)
 	task = models.ForeignKey(Task, null=True, blank=True)
 
 	class Meta:
@@ -26,12 +32,18 @@ class Review(models.Model):
 
 
 class Rating(models.Model):
-	value = models.IntegerField(default=0, null=True, blank=True)
-	"""
-	can either write a review for the contractor or specific task
-	"""
-	user = models.ForeignKey(User, null=True, blank=True, related_name='client_rater')
-	# contractor = models.ForeignKey(User, null=True, blank=True, related_name='contractor_rater')
+	RATING_CHOICES = (
+
+		('1', '1'),
+		('2', '2'),
+		('3', '3'),
+		('4', '4'),
+		('5', '5'),
+
+	)
+
+	value = models.IntegerField(default=0, null=True, blank=True, choices=RATING_CHOICES)
+	# user = models.ForeignKey(User, null=True, blank=True)
 	task = models.ForeignKey(Task, null=True, blank=True)
 
 	class Meta:
