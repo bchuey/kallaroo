@@ -1,6 +1,10 @@
 {% extends 'partials_base.html' %}
+{% block jsblock %}
 
+{% endblock %}
 {% block jquery %}
+
+
 	$(".sidenav-link").on("click", function(){
 
 		var href = $(this).attr('href');
@@ -13,7 +17,10 @@
 
 
 {% endblock %}
+{% block sockets %}
 
+
+{% endblock %}
 
 {% block sidebar %}
 	<div class="col-md-2 sidenav">

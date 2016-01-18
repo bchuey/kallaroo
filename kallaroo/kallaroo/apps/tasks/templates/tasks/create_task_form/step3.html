@@ -1,14 +1,25 @@
 {% extends 'base.html' %}
 
 {% block jsblock %}
-	
+	<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
 {% endblock %}
 
 
 {% block jquery %}
 	
 {% endblock %}
+{% block sockets %}
+	var socket = io.connect('http://127.0.0.1:3000');
 
+	$("form").on("submit", function(){
+
+		var subcategory = "Plumbing";
+		socket.emit("new_task_added", {subcategory:subcategory});
+
+	});
+
+
+{% endblock %}
 
 {% block navbar %}
 	<div class="container">

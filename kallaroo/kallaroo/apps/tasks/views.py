@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .forms import CreateTaskForm, CreateBidForm, ChooseSubcategoryForm, SetAddressForm, AddTaskDetailsForm
 from .models import Task, Bid, BidSerializer, Location
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 # import datetime
@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.conf import settings
 import redis
+import json
 
 import braintree
 
@@ -78,7 +79,22 @@ class AddTaskWizard(NamedUrlSessionWizardView):
 
 		new_task.save()
 
-		return HttpResponseRedirect('/tasks')
+		"""
+		Redis Notifications
+		"""
+		r = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
+
+		context = user.username + " posted a new task in " + new_task.subcategory.title
+		
+		# channel = new_task.subcategory.title + "_channel"
+		channel = "new_task_1"
+		# print("the redis channel is: " + channel)
+		print context
+
+		r.publish(channel, context)
+
+
+		return HttpResponseRedirect('%s'%(reverse('tasks:task_list')))
 
 
 class SuccessView(TemplateView):
@@ -115,7 +131,7 @@ class TaskDetailView(DetailView):
 		if request.method == 'POST':
 			if form.is_valid():
 				
-				contractor = Contractor.objects.get(id=request.session['contractor_id'])
+				contractor = User.objects.get(id=request.session['user_id'])
 				task = Task.objects.get(id=request.POST['task_id'])
 				bid_type = request.POST['bid_type']
 				amount = request.POST['amount']
@@ -141,7 +157,9 @@ class TaskDetailView(DetailView):
 
 				context = BidSerializer(bid)
 				context = context.data
-				print context['amount'] 		# we can access the amounts like this on the server-side
+
+				context = json.dumps(context)
+
 				r.publish(channel, context)
 
 				print("bid submitted")
@@ -166,7 +184,7 @@ def accept_bid(request):
 
 		task = Task.objects.get(id=task_id)
 		bid = Bid.objects.get(id=bid_id)
-		contractor = Contractor.objects.get(id=contractor_id)
+		contractor = User.objects.get(id=contractor_id)
 
 		task.contractor = contractor
 		task.task_status = 'Active'

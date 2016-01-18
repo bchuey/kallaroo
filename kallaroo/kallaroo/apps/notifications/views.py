@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 from ..tasks.models import Task
 from .models import Notification
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
@@ -19,7 +19,7 @@ def create_notification(request):
 		task_id = request.POST.get('task_id')
 		task = Task.objects.get(id=task_id)
 
-		contractor_id = request.POST.get('contractor_id')
+		user_id = request.POST.get('user_id')
 
 		"""
 		Must pass in a dict if you don't want to serialize data

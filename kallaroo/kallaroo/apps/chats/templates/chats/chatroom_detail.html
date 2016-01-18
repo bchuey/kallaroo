@@ -34,22 +34,22 @@
 
 	socket.on('message', function(context){
 
-
 		console.log(context);
-
-		//var obj = jQuery.parseJSON(context);
-		//console.log(obj);
-		$("#chats").append("<p>" + context + "</p>");
+		//console.log(typeof(context));
+		var obj = jQuery.parseJSON(context);
+		console.log(obj);
+		//console.log(obj.text); // gets the text message
+		//console.log(obj.author.email);
+		//console.log(obj.written_at);
+		//$("#chats").append("<p>" + context + "</p>");
+		$('#chats').append("<div class='media'><div class='media-left'><span class='glyphicon glyphicon-user glyphicon-lg'></span></div><div class='media-body'><div class='well'><h4>" + obj.author.email + "<span class='pull-right'>" + obj.written_at + "</span></h4><p>" + obj.text + "</p></div></div></div>");
 		
 	});
 
-	// socket.on('response-message', function(message){
-		// console.log(message);
-	// });
 
-	/*
-	$('#chats').append("<div class='media'><div class='media-left'><span class='glyphicon glyphicon-user glyphicon-lg'></span></div><div class='media-body'><div class='well'><h4>" + author + "<span class='pull-right'>" + written_at + "</span></h4><p>" + msg + "</p></div></div></div>");
-	*/
+	
+	
+	
 
 {% endblock %}
 

@@ -14,8 +14,6 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
 )
 
 
-
-
 # Create your models here.
 class UserManager(BaseUserManager):
 	def create_user(self, email, username, first_name, last_name, password=None):
@@ -55,6 +53,11 @@ class User(AbstractBaseUser):
 	is_online = models.BooleanField(default=False)
 	is_contractor = models.BooleanField(default=False)
 	profile_pic = models.ImageField(null=True, blank=True)
+	subcategory = models.ForeignKey(Subcategory, max_length=255, null=True, blank=True)
+	rating = models.IntegerField(null=True, blank=True)
+
+	# address
+	address = models.CharField(max_length=255, null=True, blank=True)
 
 	# Braintree unique ID
 	braintree_id = models.CharField(max_length=255, null=True, blank=True)
@@ -179,46 +182,3 @@ class UserAddress(models.Model):
 
 	def get_address(self):
 		return "%s %s, %s, %s, %s" %(self.street_number, self.street_address, self.city, self.state, self.zipcode)
-
-
-"""
-Contractor model
-
-update: have Contractor inherit from User => Contractor(User) so that you can have access to login(),authenticate()
-"""
-class Contractor(models.Model):
-	username = models.CharField(max_length=50)
-	email = models.EmailField(max_length=255, unique=True)
-	first_name = models.CharField(max_length=50)
-	last_name = models.CharField(max_length=50)
-	password = models.CharField(max_length=255)
-	is_active = models.BooleanField(default=True)
-	joined_on = models.DateTimeField(auto_now_add=True, auto_now=False)
-	is_online = models.BooleanField(default=False)
-	profile_pic = models.ImageField(null=True, blank=True)
-
-	# sockets
-	socket_id = models.CharField(max_length=255, null=True, blank=True)
-	
-	class Meta:
-		db_table = 'contractors'
-
-	def __str__(self):
-		return self.username
-
-class ContractorProfile(models.Model):
-	contractor = models.OneToOneField(Contractor, on_delete=models.CASCADE)
-	description = models.TextField(null=True, blank=True)
-	rating = models.IntegerField(default=1)
-
-	"""
-	a subcategory contains many users;
-	subcategory_id in the user table 
-	"""
-	subcategory = models.ForeignKey(Subcategory, null=True, blank=True)
-
-	class Meta:
-		db_table = 'contractor_profiles'
-
-	def __str__(self):
-		return self.contractor.username

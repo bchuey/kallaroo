@@ -50,6 +50,7 @@
 			
 {% endblock %}
 {% block sockets %}
+	
 	// Realtime notifications
 	// Get the session of the logged in contractor (?)
 	var socket = io.connect('http://127.0.0.1:3000');
@@ -57,54 +58,21 @@
 	var task_id = {{ object.id }};
 	socket.emit("auction-number", {task_id:task_id});
 
-	// submit bid form
-	$("#").click(function(){
-
-		
-	});
 
 	socket.on('message', function(context){
 
 		console.log(context);
 
-		//var obj = jQuery.parseJSON(context);
-		//console.log(obj);
-		$("#bid-wrapper").append("<div class='thumbnail col-md-4'>" + context + "</div>");
+		var obj = jQuery.parseJSON(context);
+		console.log(obj);
+		$("#bid-wrapper").append("<div class='thumbnail col-md-4'><div class='caption'><div class='col-md-12'><div class='col-md-4'><img src='#'></div><div class='col-md-8'><p>" + obj.contractor.first_name + obj.contractor.last_name + "</p><p>" + obj.contractor.email + "</p><p>" + obj.contractor.rating + " stars</p><p>" + "<p>" + obj.contractor.subcategory + "</p></div></div><div class='col-md-12 text-center border-top-gray padding-top-10'><div class='col-md-6'><span class='glyphicon glyphicon-time blue'></span> <span>" + obj.estimated_hours + " hrs</span></div><div class='col-md-6'><span class='glyphicon glyphicon-usd green'></span>" + "<span>" + obj.amount + "</span></div><div class='col-md-12 padding-top-10 padding-bottom-10'>{% if object.user == request.user %}<form action='{% url 'tasks:accept_bid' %}' method='POST'>{% csrf_token %}<input type='hidden' id='task_id' name='task_id' value='{{ object.id }}' /><input type='hidden' id='bid_id' name='bid_id' value='{{ bid.id}}' /><input type='hidden' id='contractor_id' name='contractor_id' value='{{ bid.contractor.id }}'/>{% if object.final_bid != None and object.final_bid == bid %}<input type='submit' value='Accepted' class='accept-bid bid-accept-btn btn-accept-task btn-accept-task-effect'/>{% elif object.final_bid != None %}<input type='submit' value='Rejected' class='accept-bid bid-accept-btn btn-red btn-red-effect'/>{% else %}<input type='submit' value='Accept' class='accept-bid bid-accept-btn btn-accept-task btn-accept-task-effect'/>{% endif %}</form>{% endif %}</div></div></div></div>");
 		
+
 	});
 
 
 
-	// when accept button is clicked
-	$(".accept-bid").click(function(){
-		
-		var user_id = {{ request.user.id }};
 
-		// set task_id equal to the value of input id of task_id
-		var task_id = {{ object.id }};
-
-		// set contractor equal to the contractor of selected bid
-		// might have to use some more jQuery here to grab that information
-		// OR we can grab it in the views.py by querying Task.final_bid.contractor.id
-		var contractor_id = 1;
-
-		// emit a socket named 'notification' passing through task_id and contractor_id
-
-		socket.emit("notification", {
-			user_id: user_id, 
-			task_id: task_id, 
-			contractor_id : contractor_id,
-		});
-
-		// listen to 'send_notification' and do something
-		socket.on("send_notification", function(response){
-			$("#responseOutput").append("<p>we got a response</p>");
-			console.log("success, we can grab the response");
-		});
-
-		// if you return false; "we got a response" is appended and page doesn't refresh, but the accept button doesn't get the disable attribute
-
-	});
 {% endblock %}
 {% block navbar %}
 <div id="confirmation-message" class="row">
@@ -139,7 +107,7 @@
 				<!-- google map goes here -->
 			</div>
 		</div>
-		{% if request.user.is_contractor != False %}
+		{% if request.user.is_contractor %}
 		<div class="col-md-12">
 			<form action="{% url 'tasks:task_detail' object.id %}" method="POST" class="col-md-6">
 				{% csrf_token %}
@@ -149,11 +117,12 @@
 			</form>
 		</div>
 		{% endif %}
-		{% if 'contractor_id' not in request.session %}
+		{% if not request.user.is_contractor %}
 		<div class="col-md-12">
-			{% if bids %}
-				<h3>Bids:</h3>
-				<div id="bid-wrapper" class="row col-md-12">
+			
+			<h3>Bids:</h3>
+			<div id="bid-wrapper" class="row col-md-12">
+			{% if bids %}	
 				{% for bid in bids %}
 				<div class="thumbnail col-md-4">
 					<div class="caption">

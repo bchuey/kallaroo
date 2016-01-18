@@ -7,8 +7,18 @@
 
 {% block jquery %}
 	
+	// if the checkbox is checked
+	//if(document.getElementById('id_is_contractor').checked){
+		// $("#id_subcategory").attr("disabled", true);
+		//alert('hello');
+	//}
+
 {% endblock %}
 
+{% block sockets %}
+	
+
+{% endblock %}
 
 {% block navbar %}
 	<div class="container">
@@ -33,7 +43,7 @@
 <div class="row section-light-gray border-top-gray">
 	<div class="container" id="task-form-container">
 		<div class="col-md-12">
-			<form action="{% url 'accounts:register-profile' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+			<form action="{% url 'accounts:register_profile' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
 				{% csrf_token %}
 				<div class="col-md-12 task-field-container">
 					{% for field in form %}
@@ -42,8 +52,9 @@
 							{{ field }}
 						</div>
 					{% endfor %}
+					
 				</div>
-				<input type="submit" value="Continue" id="add_task" class="btn-blue btn-blue-effect col-xs-12" />
+				<input type="submit" value="Continue" id="add_profile" class="btn-blue btn-blue-effect col-xs-12" />
 			</form>
 		</div>
 	</div>

@@ -7,6 +7,6 @@ urlpatterns = [
 	url(r'^subcategories/$', views.SubcategoryListView.as_view(), name='subcategories'),
 	url(r'^subcategories/(?P<pk>\d+)/$', views.SubcategoryDetailView.as_view(), name='subcategory'),
 
-	url(r'^subcategories/(?P<pk>\d+)/tasks/$', views.SubcategoryTaskDetailView.as_view(), name='subcategory-task-list'),
-	url(r'^subcategories/(?P<pk>\d+)/contractors/$', views.SubcategoryContractorDetailView.as_view(), name='subcategory-contractor-list'),
+	url(r'^subcategories/(?P<pk>\d+)/tasks/$', views.SubcategoryTaskDetailView.as_view(), name='subcategory_task_list'),
+	url(r'^subcategories/(?P<pk>\d+)/contractors/$', views.SubcategoryContractorDetailView.as_view(), name='subcategory_contractor_list'),
 ]

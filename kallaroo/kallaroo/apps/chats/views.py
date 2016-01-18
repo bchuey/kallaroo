@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from ..accounts.models import User, Contractor
+from ..accounts.models import User
 from .models import Chatroom, Chat, ChatSerializer
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, JsonResponse
@@ -10,9 +10,12 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 # from redis_collections import Dict
-from django.core import serializers
+from django.utils.encoding import smart_text
 
+from django.core import serializers
+import json
 import redis
+
 
 @login_required
 def home(request):
@@ -49,12 +52,13 @@ def create_chatroom(request):
 	"""
 	if request.method == "POST":
 		user_id = request.POST['user_id']
-		user = User.objects.get(id=user_id)
+		creator = User.objects.get(id=user_id)
 
-		contractor_id = request.POST['contractor_id']
-		contractor = Contractor.objects.get(id=contractor_id)
+		# contractor_id = request.POST['contractor_id']
+		# contractor = Contractor.objects.get(id=contractor_id)
+		participant = User.objects.get(id=request.POST['contractor_id'])
 
-		chatroom = Chatroom.objects.create(creator=user, participant=contractor)
+		chatroom = Chatroom.objects.create(creator=creator, participant=participant)
 
 		# redirect to the chatroom, pass in the id of that chatroom in args=[chatroom.id]
 		# return HttpResponse("everything worked")
@@ -72,11 +76,7 @@ def create_chatroom(request):
 def send_message(request):
 
 	if request.method == "POST":
-		# try:
-			# grab the author through session_key
-			# session = Session.objects.get(session_key=request.POST.get('sessionid'))
-			# user_id = session.get_decoded().get('_auth_user_id')
-			# user = User.objects.get(id=user_id)
+
 		user = User.objects.get(id=request.POST.get('user_id'))
 		chatroom = Chatroom.objects.get(id=request.POST.get('chatroom_id'))
 
@@ -92,25 +92,17 @@ def send_message(request):
 		# is this the chatroom part?
 		r = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
 
-		# context = {
-		# 	'author': chat.author.username,
-		# 	'msg': chat.text,
-		# 	'written_at': chat.written_at,
-		# }
-
-		# select_related
-		
-
-		# query = Chat.objects.select_related('author').filter(id=chat.id)
-
 		context = ChatSerializer(chat)
 
-		# print(context.data)
 		context = context.data
+
+		context = json.dumps(context)
+		print(context)
 
 		r.publish(channel, context)
 
 		return HttpResponse("Everything worked!")
+
 
 
 

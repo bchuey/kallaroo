@@ -19,9 +19,11 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if user.is_authenticated %}
-        <li>
-          <a href="{% url 'tasks:task_step' 'subcategory' %}">Add Task</a>
-        </li>
+          {% if not user.is_contractor %}
+          <li>
+            <a href="{% url 'tasks:task_step' 'subcategory' %}">Add Task</a>
+          </li>
+          {% endif %}
         <li><a href="{% url 'accounts:dashboard' user.id %}">My Dashboard</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ user.username }} <span class="caret"></span></a>
