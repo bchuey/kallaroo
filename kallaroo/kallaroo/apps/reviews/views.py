@@ -22,7 +22,10 @@ def add_review(request):
 			pass
 		comment = request.POST['comment']
 		rating = request.POST['rating']
-		task = Task.objects.get(id=request.POST['task_id'])
+		try:
+			task = Task.objects.get(id=request.POST['task_id'])
+		except:
+			pass
 
 		new_review = Review()
 		new_review.author = author
@@ -32,8 +35,13 @@ def add_review(request):
 			pass
 		new_review.comment = comment
 		new_review.rating = rating
-		new_review.task = task
+		try:
+			new_review.task = task
+		except:
+			pass
 
 		new_review.save()
-
-		return HttpResponseRedirect('%s'%(reverse('tasks:task_detail', args=[task.id])))
+		try:
+			return HttpResponseRedirect('%s'%(reverse('tasks:task_detail', args=[task.id])))
+		except:
+			return HttpResponseRedirect('%s'%(reverse('accounts:contractor_profile', args=[reviewee.id])))

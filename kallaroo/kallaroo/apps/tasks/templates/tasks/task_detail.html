@@ -184,7 +184,7 @@
 		<div class="container">
 			<div class="col-md-12">
 				<h3>Reviews</h3>
-				{% for review in object.review_set.all %}
+				{% for review in reviews %}
 				<div class="well col-md-8">
 					<p>written by: {{ review.author }} | written on: {{ review.posted_at }}</p>
 					<p>{{ review.rating }}</p>

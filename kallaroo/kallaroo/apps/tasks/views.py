@@ -120,6 +120,7 @@ class TaskDetailView(DetailView):
 		context = super(TaskDetailView, self).get_context_data(**kwargs)
 		context['bid_form'] = self.form()
 		context['bids'] = self.object.bid_set.all()
+		context['reviews'] = self.object.review_set.all()
 		context['review_form'] = CreateReviewForm
 		try:
 			context['location'] = Location.objects.get(task=self.object)

@@ -9,6 +9,8 @@ from .models import User, UserAddress
 from ..categories.models import Subcategory
 from ..tasks.models import Task
 from ..tasks.forms import CreateTaskForm
+from ..reviews.forms import CreateReviewForm
+from ..reviews.models import Review
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
@@ -338,9 +340,17 @@ class AllContractorsView(View):
 class ContractorProfileView(DetailView):
 	model = User
 	template_name = 'accounts/contractors/detail.html'
+	form = CreateReviewForm
 
+	def get_context_data(self, **kwargs):
+		context = super(ContractorProfileView, self).get_context_data(**kwargs)
+		# context['reviews'] = Review.objects.all().filter(reviewee=self.object)
+		context['reviews'] = self.object.reviewee.all()
+		# print(context['reviews'])
+		context['review_form'] = self.form()
+		return context
 
-
+	
 
 
 
