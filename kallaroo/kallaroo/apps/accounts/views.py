@@ -187,7 +187,7 @@ class RegisterPaymentView(View):
 		user.date_of_birth = request.POST['date_of_birth']
 
 
-		stripe.api_key = PLATFORM_SECRET_KEY
+		stripe.api_key = 'sk_test_BvXnJuHaPBDFDR0nou3Qq4Qn'
 
 		# create the account
 		result = stripe.Account.create(
@@ -195,11 +195,18 @@ class RegisterPaymentView(View):
 			managed=True,
 		)
 
-		print result
+		# print result
 		# grab the account.id
 		user.stripe_id = result.id
-		user.stripe_secret_key = result.keys.secret
-		user.stripe_publishable_key = result.keys.publishable
+		print("===========")
+		print("user stripe account id: " + result.id)
+		print("===========")
+		# print(result.keys()) 		# <built-in method keys of Account object at 0x1060bd868>
+
+
+		# user.stripe_secret_key = result.keys
+
+		# user.stripe_publishable_key = result.keys.publishable
 		user.save()
 
 		# context = {
@@ -216,25 +223,33 @@ class RegisterPaymentView(View):
 
 		
 		# grab the CC data from form submission
-		exp_month = request.POST['exp_month']
-		exp_year = request.POST['exp_year']
-		cc_number = request.POST['cc_number']
-		cc_cvc = request.POST['cc_cvc']
+		# exp_month = request.POST['exp_month']
+		# exp_year = request.POST['exp_year']
+		# cc_number = request.POST['cc_number']
+		# cc_cvc = request.POST['cc_cvc']
 
 
-		# attach CC to Account
-		credit_card = account.external_accounts.create(
-			external_account={
-				'object': 'card',
-				'exp_month': exp_month,
-				'exp_year': exp_year,
-				'number': cc_number,
-				'currency': 'usd',
-				'cvc': cc_cvc,
-			}
-		)
+		# # attach CC to Account
+		# credit_card = account.external_accounts.create(
+		# 	external_account={
+		# 		'object': 'card',
+		# 		'exp_month': exp_month,
+		# 		'exp_year': exp_year,
+		# 		'number': cc_number,
+		# 		'currency': 'usd',
+		# 		'cvc': cc_cvc,
+		# 	}
+		# )
 		
-		print credit_card
+		stripe_cc_token = request.POST['stripeToken']
+		print("==========")
+		print("the account stripe token is: " + stripe_cc_token)
+		print("==========")
+		account.external_accounts.create(external_account=stripe_cc_token)
+
+		account.save()
+
+		# print credit_card
 		# grab the bank account data from form submission
 		"""
 		"id": "ba_17UnXx2eZvKYlo2CxDVhPoUp",

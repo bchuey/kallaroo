@@ -4,7 +4,7 @@
 <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
-	Stripe.setPublishableKey('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+	Stripe.setPublishableKey('pk_test_ibg1UGcODKHiCZeMSEuMxaCt');
 </script>
 {% endblock %}
 
@@ -21,6 +21,42 @@
 
 
 	});
+
+	// stripe
+
+	jQuery(function($) {
+	  $('#payment-form').submit(function(event) {
+	    var $form = $(this);
+
+	    // Disable the submit button to prevent repeated clicks
+	    $form.find('#complete_registration').prop('disabled', true);
+
+	    Stripe.card.createToken($form, stripeResponseHandler);
+
+	    // Prevent the form from submitting with the default action
+	    return false;
+	  });
+	});
+
+	function stripeResponseHandler(status, response) {
+	  var $form = $('#payment-form');
+
+	  if (response.error) {
+	    // Show the errors on the form
+	    $form.find('.payment-errors').text(response.error.message);
+	    $form.find('button').prop('disabled', false);
+	  } else {
+	    // response contains id and card, which contains additional card details
+	    var token = response.id;
+	    console.log(response);
+	    // Insert the token into the form so it gets submitted to the server
+	    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+	    // and submit
+	    $form.get(0).submit();
+	  }
+	};
+
+	
 
 {% endblock %}
 
@@ -47,7 +83,7 @@
 <div class="row section-light-gray border-top-gray">
 	<div class="container" id="task-form-container">
 		<div class="col-md-12">
-			<form action="{% url 'accounts:register_payment' %}" method="POST">
+			<form id="payment-form" action="{% url 'accounts:register_payment' %}" method="POST">
 				{% csrf_token %}
 				{% for field in form %}
 				<div class='form-group'>
@@ -55,8 +91,21 @@
 				{{ field }}
 				</div>
 				{% endfor %}
-				
-				<input type="submit" id="complete_registration" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
+				<div class="form-group">
+					<input type="text" class="form-control" data-stripe="number" placeholder="credit card number"/>
+				</div>
+				<div class="form-group">
+					<input type="text" class="form-control" data-stripe="cvc" placeholder="cvc"/>
+				</div>
+				<div class="form-group">
+					<input type="text" class="form-control"  data-stripe="exp-month" placeholder="expiration month"/>
+					<input type="text" class="form-control"  data-stripe="exp-year" placeholder="expiration year"/>
+				</div>
+				<inpu type="hidden" data-stripe="currency" value="USD" />
+				<input type="hidden" name="stripeToken" id="stripeToken" />
+				<div class="form-group">
+					<input type="submit" id="complete_registration" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
+				</div>
 			</form>
 			
 		</div>

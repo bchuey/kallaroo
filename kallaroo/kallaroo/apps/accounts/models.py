@@ -14,6 +14,8 @@ import stripe
 stripe.api_key = PLATFORM_SECRET_KEY
 """
 
+stripe.api_key = 'sk_test_BvXnJuHaPBDFDR0nou3Qq4Qn'
+
 braintree.Configuration.configure(braintree.Environment.Sandbox,
     merchant_id=settings.BRAINTREE_MERCHANT_ID,
     public_key=settings.BRAINTREE_PUBLIC,
