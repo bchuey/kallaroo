@@ -4,7 +4,7 @@ from django.views.generic import View, TemplateView, ListView, DetailView
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
-from .forms import UserCreationForm, UserChangeForm, LoginForm, UserAddressForm
+from .forms import UserCreationForm, UserChangeForm, LoginForm, UserAddressForm, StripePaymentForm
 from .models import User, UserAddress
 from ..categories.models import Subcategory
 from ..tasks.models import Task
@@ -22,6 +22,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 import braintree
+import stripe
+import time
 
 braintree.Configuration.configure(braintree.Environment.Sandbox,
     merchant_id=settings.BRAINTREE_MERCHANT_ID,
@@ -74,9 +76,9 @@ class RegisterProfileView(View):
 				except:
 					pass
 
-				user.braintree_id = user.get_braintree_id()
+				# user.braintree_id = user.get_braintree_id()
 
-				user.braintree_client_token = user.get_client_token()
+				# user.braintree_client_token = user.get_client_token()
 
 				user.save()
 
@@ -135,15 +137,16 @@ class RegisterAddressView(View):
 
 class RegisterPaymentView(View):
 	model = User
-	template_name = 'accounts/register_user/step3.html'
+	template_name = 'accounts/register_user/step3_stripe.html'
 
 	def get(self, request, *args, **kwargs):
 		
 		user = User.objects.get(id=request.session['user_id'])
-		braintree_client_token = user.braintree_client_token
+		# braintree_client_token = user.braintree_client_token
 		context = {
-			'braintree_client_token': braintree_client_token,
+			# 'braintree_client_token': braintree_client_token,
 			'user': user,
+			'form': StripePaymentForm,
 		}
 
 		return render(request, self.template_name, context)
@@ -151,31 +154,127 @@ class RegisterPaymentView(View):
 	def post(self, request, *args, **kwargs):
 		# print(request.POST.get('payment_method_nonce'))
 		user = User.objects.get(id=request.session['user_id'])
-		user.payment_method_nonce = request.POST.get('payment_method_nonce')
+		# user.payment_method_nonce = request.POST.get('payment_method_nonce')
+		# user.save()
+
+		# result = braintree.PaymentMethod.create({
+		# 	"customer_id": user.braintree_id,
+		# 	"payment_method_nonce": user.payment_method_nonce,
+		# })
+
+		# if result.is_success:
+		# 	print("=============")
+		# 	print("success")
+		# 	print("=============")
+		# 	# print(result.payment_method)
+		# 	# print(result.payment_method.unique_number_identifier)
+		# 	# print(result.payment_method.token)
+		# 	user.payment_method_token = result.payment_method.token
+		# 	user.save()
+		# 	messages.success(request, "You have successfully registered your account.")
+
+		# 	return HttpResponseRedirect('%s'%(reverse('accounts:dashboard',args=[user.id])))
+		# else:
+		# 	print("=============")
+		# 	print("failed")
+		# 	print("=============")
+		# 	return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
+
+
+		""" Stripe Integration """
+		
+		# grab user date of birth
+		user.date_of_birth = request.POST['date_of_birth']
+
+
+		stripe.api_key = PLATFORM_SECRET_KEY
+
+		# create the account
+		result = stripe.Account.create(
+			country='US',
+			managed=True,
+		)
+
+		print result
+		# grab the account.id
+		user.stripe_id = result.id
+		user.stripe_secret_key = result.keys.secret
+		user.stripe_publishable_key = result.keys.publishable
 		user.save()
 
-		result = braintree.PaymentMethod.create({
-			"customer_id": user.braintree_id,
-			"payment_method_nonce": user.payment_method_nonce,
-		})
+		# context = {
+		# 	'stripe_id': self.stripe_id,
+		# 	'stripe_secret_key': self.stripe_secret_key,
+		# 	'stripe_publishable_key': self.stripe_publishable_key,
+		# }
 
-		if result.is_success:
-			print("=============")
-			print("success")
-			print("=============")
-			# print(result.payment_method)
-			# print(result.payment_method.unique_number_identifier)
-			# print(result.payment_method.token)
-			user.payment_method_token = result.payment_method.token
-			user.save()
-			messages.success(request, "You have successfully registered your account.")
+		# retrieve the account and sign the ToS
+		account = stripe.Account.retrieve(result.id)
+		account.tos_acceptance.date = int(time.time())
+		account.tos_acceptance.ip = '67.160.206.40' # Depends on what web framework you're using
+		account.save()
 
-			return HttpResponseRedirect('%s'%(reverse('accounts:dashboard',args=[user.id])))
-		else:
-			print("=============")
-			print("failed")
-			print("=============")
-			return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
+		
+		# grab the CC data from form submission
+		exp_month = request.POST['exp_month']
+		exp_year = request.POST['exp_year']
+		cc_number = request.POST['cc_number']
+		cc_cvc = request.POST['cc_cvc']
+
+
+		# attach CC to Account
+		credit_card = account.external_accounts.create(
+			external_account={
+				'object': 'card',
+				'exp_month': exp_month,
+				'exp_year': exp_year,
+				'number': cc_number,
+				'currency': 'usd',
+				'cvc': cc_cvc,
+			}
+		)
+		
+		print credit_card
+		# grab the bank account data from form submission
+		"""
+		"id": "ba_17UnXx2eZvKYlo2CxDVhPoUp",
+		"object": "bank_account",
+		"account": "acct_1032D82eZvKYlo2C",
+		"account_holder_type": "individual",
+		"bank_name": "STRIPE TEST BANK",
+		"country": "US",
+		"currency": "usd",
+		"default_for_currency": false,
+		"fingerprint": "1JWtPxqbdX5Gamtc",
+		"last4": "6789",
+		"metadata": {
+		},
+		"name": "Jane Austen",
+		"routing_number": "110000000",
+		"status": "new",
+		"customer": "cus_7kHbMq1VpX8gJN"
+		"""
+
+		bank_account_number = request.POST['bank_account']
+		bank_name = request.POST['bank_name']
+		routing_number = request.POST['routing_number']
+
+		bank_account = account.external_accounts.create(
+			external_account={
+				'object': 'bank_account',
+				'account': bank_account_number,
+				'account_holder_type': 'individual',
+				'bank_name': bank_name,
+				'country': 'US',
+				'currency': 'usd',
+				'routing_number': routing_number,
+
+			}
+		)
+
+		print bank_account
+
+		return HttpResponseRedirect('%s'%(reverse('accounts:dashboard',args=[user.id])))
 
 class UserProfileDetailView(DetailView):
 	model = User

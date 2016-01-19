@@ -6,6 +6,13 @@ from django.conf import settings
 from django.db.models.signals import pre_save, post_save
 from django.conf import settings
 import braintree
+import stripe
+
+"""
+*Don't forget to import the PLATFORM_SECRET_KEY
+
+stripe.api_key = PLATFORM_SECRET_KEY
+"""
 
 braintree.Configuration.configure(braintree.Environment.Sandbox,
     merchant_id=settings.BRAINTREE_MERCHANT_ID,
@@ -60,10 +67,17 @@ class User(AbstractBaseUser):
 	address = models.CharField(max_length=255, null=True, blank=True)
 
 	# Braintree unique ID
-	braintree_id = models.CharField(max_length=255, null=True, blank=True)
-	braintree_client_token = models.CharField(max_length=2000, null=True, blank=True)
-	payment_method_nonce = models.CharField(max_length=255, null=True, blank=True)
-	payment_method_token = models.CharField(max_length=255, null=True, blank=True)
+	# braintree_id = models.CharField(max_length=255, null=True, blank=True)
+	# braintree_client_token = models.CharField(max_length=2000, null=True, blank=True)
+	# payment_method_nonce = models.CharField(max_length=255, null=True, blank=True)
+	# payment_method_token = models.CharField(max_length=255, null=True, blank=True)
+
+	# Stripe (Managed Accounts)
+	date_of_birth = models.DateField(auto_now_add=False, auto_now=False, null=True, blank=True)
+	stripe_id = models.CharField(max_length=255, null=True, blank=True)
+	stripe_secret_key = models.CharField(max_length=255, null=True, blank=True)
+	stripe_publishable_key = models.CharField(max_length=255, null=True, blank=True)
+
 
 	# sockets
 	socket_id = models.CharField(max_length=255, null=True, blank=True)
@@ -101,30 +115,55 @@ class User(AbstractBaseUser):
 
 	Might be best to save the client_token once you have created it the first time
 	"""
-	def get_braintree_id(self):
+	# def get_braintree_id(self):
 
-		if not self.braintree_id:
-			result = braintree.Customer.create({
-				"first_name": self.first_name,
-		    "last_name": self.last_name,
-		    "email": self.email,
-			})
-			if result.is_success:
-				self.braintree_id = result.customer.id
-				self.save()
-		return self.braintree_id
-		# return None
+	# 	if not self.braintree_id:
+	# 		result = braintree.Customer.create({
+	# 			"first_name": self.first_name,
+	# 	    	"last_name": self.last_name,
+	# 	    	"email": self.email,
+	# 		})
+	# 		if result.is_success:
+	# 			self.braintree_id = result.customer.id
+	# 			self.save()
+	# 	return self.braintree_id
+	# 	# return None
 		
-	def get_client_token(self):
-		customer_id = self.get_braintree_id()
-		if customer_id:
-			client_token = braintree.ClientToken.generate({
-					"customer_id": customer_id,
-				})
-			self.braintree_client_token = client_token
-			self.save()
-			return client_token
-		return None
+	# def get_client_token(self):
+	# 	customer_id = self.get_braintree_id()
+	# 	if customer_id:
+	# 		client_token = braintree.ClientToken.generate({
+	# 				"customer_id": customer_id,
+	# 			})
+	# 		self.braintree_client_token = client_token
+	# 		self.save()
+	# 		return client_token
+	# 	return None
+
+	"""
+	==========
+	STRIPE
+	==========
+	"""
+
+	# def get_stripe_id(self):
+	# 	result = stripe.Account.create(
+	# 				country='US',
+	# 				managed=True,
+	# 			)
+
+	# 	self.stripe_id = result.id
+	# 	self.stripe_secret_key = result.keys.secret
+	# 	self.stripe_publishable_key = result.keys.publishable
+	# 	self.save()
+
+	# 	context = {
+	# 		'stripe_id': self.stripe_id,
+	# 		'stripe_secret_key': self.stripe_secret_key,
+	# 		'stripe_publishable_key': self.stripe_publishable_key,
+	# 	}
+
+	# 	return context
 
 
 """
@@ -139,11 +178,55 @@ Need to learn how signals work
 post_save.connect(method_name, sender=another_method_or_class_name)
 
 """
-def update_braintree_id(sender, instance, *args, **kwargs):
-	if not instance.braintree_id:
-		instance.get_braintree_id()
+# def update_braintree_id(sender, instance, *args, **kwargs):
+# 	if not instance.braintree_id:
+# 		instance.get_braintree_id()
 
-post_save.connect(update_braintree_id, sender=User)
+# post_save.connect(update_braintree_id, sender=User)
+
+# class UserPaymentInfo(models.Model):
+# 	user = models.ForeignKey(User, on_delete=models.CASCADE)
+# 	date_of_birth = models.DateField(blank=True)
+# 	stripe_id = models.CharField(max_length=255, blank=True)
+# 	stripe_secret_key = models.CharField(max_length=255, blank=True)
+# 	stripe_publishable_key = models.CharField(max_length=255, blank=True)
+
+# 	class Meta:
+# 		db_table = 'userpaymentinfos'
+
+# 	def __str__(self):
+# 		return str(self.id)
+
+# 	"""
+# 	==========
+# 	STRIPE
+# 	==========
+# 	"""
+
+# 	def get_stripe_id(self):
+# 		result = stripe.Account.create(
+# 					country='US',
+# 					managed=True,
+# 				)
+
+# 		self.stripe_id = result.id
+# 		self.stripe_secret_key = result.keys.secret
+# 		self.stripe_publishable_key = result.keys.publishable
+# 		self.save()
+
+# 		context = {
+# 			'stripe_id': self.stripe_id,
+# 			'stripe_secret_key': self.stripe_secret_key,
+# 			'stripe_publishable_key': self.stripe_publishable_key,
+# 		}
+
+# 		return context
+
+
+
+
+
+
 
 class UserAddressManager(models.Manager):
 	def create_address(self, street_number, street_address, city, state, zipcode):

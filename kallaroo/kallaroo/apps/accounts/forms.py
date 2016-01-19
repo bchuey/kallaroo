@@ -76,6 +76,41 @@ class UserChangeForm(forms.ModelForm):
 		return self.initial['password']
 
 """
+============
+Stripe form 
+============
+"""
+
+class StripePaymentForm(forms.Form):
+	MONTH_CHOICES = (
+		('1', '1'),
+		('2', '2'),
+		('3', '3'),
+		('4', '4'),
+		('5', '5'),
+		('6', '6'),
+		('7', '7'),
+		('8', '8'),
+		('9', '9'),
+		('10', '10'),
+		('11', '11'),
+		('12', '12'),
+
+	)
+	date_of_birth = forms.DateField(label='Date of Birth', widget=forms.DateInput(attrs={'type':'date','class':'form-control'}), input_formats=['%m/%d/%Y'])
+	cc_number = forms.CharField(label='Credit Card Number', widget=forms.TextInput(attrs={'class':'form-control','data-stripe':'number'}))
+	cc_cvc = forms.CharField(label='CVC', widget=forms.TextInput(attrs={'class':'form-control','data-stripe':'cvc'}))
+	exp_month = forms.ChoiceField(label='Exp Month', widget=forms.Select(attrs={'class':'form-control','data-stripe':'exp-month'}), choices=MONTH_CHOICES)
+	exp_year = forms.IntegerField(label='Exp Year', widget=forms.NumberInput(attrs={'class':'form-control','data-stripe':'exp-year'}))
+
+	bank_account = forms.CharField(label='Bank Account #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
+	bank_name = forms.CharField(label='Bank Name', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
+	routing_number = forms.CharField(label='Routing #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
+	
+	# clean the info somehow
+
+
+"""
 ===============
 Login
 ===============
