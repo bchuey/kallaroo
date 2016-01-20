@@ -262,6 +262,7 @@ def end_task(request):
 
 		task.final_payment = total_hours * task.final_bid.amount
 		# payment = task.final_payment
+		print(task.final_payment)
 		task.task_status = "Completed"
 		task.task_completed_at = timezone.localtime(timezone.now())
 		task.is_completed = True
@@ -276,18 +277,28 @@ def send_payment(request):
 
 		task = Task.objects.get(id=request.POST['task_id'])
 		payment = task.final_payment
-
+		payment = payment*100
+		payment = int(payment)
+		print(payment)
+		print("=======")
+		print("the total payment is: " + str(payment))
+		print("=======")
 		client = request.user
 		contractor = User.objects.get(id=request.POST['contractor_id'])
 		
-		stripe_token = request.POST['stripeToken']
+		# stripe_token = request.POST['stripeToken']
 
 		client_account = stripe.Account.retrieve(client.stripe_account_id)
-		client_bank_account = account.external_accounts.retrieve(client.stripe_bank_account_id)
-
+		client_customer_account = stripe.Customer.retrieve(client.stripe_customer_id)
+		client_bank_account = client_account.external_accounts.retrieve(client.stripe_bank_account_id)
+		print("===============")
+		print("the client account is: " + client_account.id)
+		print("===============")
 		contractor_account = stripe.Account.retrieve(contractor.stripe_account_id)
-		contractor_bank_account = stripe.Account.retrieve(contractor.stripe_bank_account_id)
-
+		contractor_bank_account = contractor_account.external_accounts.retrieve(contractor.stripe_bank_account_id)
+		print("===============")
+		print("the contractor account is: " + contractor_account.id)
+		print("===============")
 		# charge the client
 		"""
 		customer => who is going to be charged (i.e. passenger)
@@ -295,13 +306,16 @@ def send_payment(request):
 		"""
 
 		result = stripe.Charge.create(
-		  amount=,
+		  amount=payment,
 		  currency='usd',
 		  # source=stripe_token,
-		  application_fee=,
-		  customer=client_account,
-		  destination=contractor_account,
+		  application_fee=1000,
+		  customer=client_customer_account, 			# needs to be a cus_xxxxxxxx
+		  destination=contractor_account, 	# needs to be the acct_xxxxxx of recipient
 		)
+		print("=============")
+		print("payment sent: " + result.id)
+		print("=============")
 
 		if result.status == "succeeded":
 			task.task_status = "Paid"
@@ -309,7 +323,7 @@ def send_payment(request):
 			messages.success(request, "Your payment has been sent.")
 			return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
 		else:
-			messages.warning(request, '%s'%(result.message))
+			messages.warning(request, "Something went wrong with payment")
 			return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
 
 

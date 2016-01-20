@@ -20,6 +20,10 @@
         <li>
             <a href="{% url 'accounts:contractors_all' %}">Contractors</a>
         </li>
+        {% else %}
+        <li>
+            <a href="{% url 'tasks:task_list' %}">Tasks</a>
+        </li>
         {% endif %}
       </ul>
       <ul class="nav navbar-nav navbar-right">

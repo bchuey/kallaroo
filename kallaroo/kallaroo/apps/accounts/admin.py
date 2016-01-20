@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
 		('Personal Info', {'fields': ('first_name', 'last_name',)}),
 		('Permissions', {'fields': ('is_contractor', 'is_admin',)}),
 		# ('Braintree', {'fields': ('braintree_id','braintree_client_token','payment_method_nonce','payment_method_token')}),
-		('Stripe', {'fields': ('stripe_account_id', 'stripe_card_id', 'stripe_bank_account_id',)}),
+		('Stripe', {'fields': ('stripe_account_id', 'stripe_customer_id', 'stripe_card_id', 'stripe_bank_account_id',)}),
 		('Address', {'fields': ('address',)}),
 		('Subcategory', {'fields': ('subcategory',)}),
 		('Sockets', {'fields': ('socket_id',)}),

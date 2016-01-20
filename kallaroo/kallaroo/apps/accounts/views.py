@@ -185,7 +185,17 @@ class RegisterPaymentView(View):
 		
 		# grab user date of birth
 		user.date_of_birth = request.POST['date_of_birth']
+		print("==========")
+		print(user.date_of_birth)	# 1980-01-29
+		print("==========")
 
+		dob = user.date_of_birth
+
+		dob = dob.split('-')
+
+		year = dob[0]
+		month = dob[1]
+		day = dob[2]
 
 		stripe.api_key = 'sk_test_BvXnJuHaPBDFDR0nou3Qq4Qn'
 
@@ -193,6 +203,7 @@ class RegisterPaymentView(View):
 		result = stripe.Account.create(
 			country='US',
 			managed=True,
+			email=user.email,
 		)
 
 		# store the acct_xxxxxxxx
@@ -201,13 +212,26 @@ class RegisterPaymentView(View):
 		print("user stripe account id: " + result.id)
 		print("===========")
 
-		# user.save()
+		# secret and publishable key
+		print("===========")
+		print(result)
+		# print(result.keys.publishable)
+		# print(result.keys.secret)
+		print("===========")
 
 
 		# retrieve the account and sign the ToS
 		account = stripe.Account.retrieve(result.id)
 		account.tos_acceptance.date = int(time.time())
 		account.tos_acceptance.ip = '67.160.206.40' # Depends on what web framework you're using
+
+		# update account to include legal_entity data
+		account.legal_entity.first_name = user.first_name
+		account.legal_entity.last_name = user.last_name
+		account.legal_entity.dob.day = day
+		account.legal_entity.dob.month = month
+		account.legal_entity.dob.year = year
+		account.legal_entity.type = "individual"
 		account.save()
 		
 
@@ -224,9 +248,16 @@ class RegisterPaymentView(View):
 		  source=stripe_cc_token,
 		)
 
+		print("=============")
+		print("this is the customer: ")
+		print(customer)
+		print("=============")
+
+		# save the cus_xxxxxxxx to the user (this will be used to create the charges)
+		user.stripe_customer_id = customer.id
 		# save the card_xxxxxxx to the user (credit card)
 		user.stripe_card_id = customer.sources.data[0].id
-
+		
 
 		# grab the bank account data from form submission
 		"""
@@ -253,6 +284,44 @@ class RegisterPaymentView(View):
 		routing_number = request.POST['routing_number']
 
 		# attach a bank account to the 'managed account'
+		# how to do verification/authentication???
+		"""
+		"legal_entity": {
+	    	"additional_owners": null,
+		    "address": {
+		      "city": null,
+		      "country": "US",
+		      "line1": null,
+		      "line2": null,
+		      "postal_code": null,
+		      "state": null
+		    },
+	    	"business_name": null,
+		    "dob": {
+		      "day": null,
+		      "month": null,
+		      "year": null
+		    },
+		    "first_name": null,
+		    "last_name": null,
+		    "personal_address": {
+		      "city": null,
+		      "country": null,
+		      "line1": null,
+		      "line2": null,
+		      "postal_code": null,
+		      "state": null
+		    },
+		    "personal_id_number_provided": false,
+		    "ssn_last_4_provided": false,
+		    "type": null,
+		    "verification": {
+		      "details": null,
+		      "details_code": "failed_other",
+		      "document": null,
+		      "status": "unverified"
+		    }
+	    """
 		bank_account = account.external_accounts.create(
 			external_account={
 				'object': 'bank_account',
@@ -266,8 +335,9 @@ class RegisterPaymentView(View):
 			}
 		)
 
-		print bank_account
 
+		print bank_account
+		account.save()
 		user.stripe_bank_account_id = bank_account.id
 		
 		user.save()
