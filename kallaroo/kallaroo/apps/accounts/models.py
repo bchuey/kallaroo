@@ -76,7 +76,10 @@ class User(AbstractBaseUser):
 
 	# Stripe (Managed Accounts)
 	date_of_birth = models.DateField(auto_now_add=False, auto_now=False, null=True, blank=True)
-	stripe_id = models.CharField(max_length=255, null=True, blank=True)
+	stripe_account_id = models.CharField(max_length=255, null=True, blank=True)
+	stripe_card_id = models.CharField(max_length=255, null=True, blank=True)
+	stripe_bank_account_id = models.CharField(max_length=255, null=True, blank=True)
+
 	stripe_secret_key = models.CharField(max_length=255, null=True, blank=True)
 	stripe_publishable_key = models.CharField(max_length=255, null=True, blank=True)
 

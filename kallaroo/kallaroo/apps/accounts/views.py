@@ -195,61 +195,39 @@ class RegisterPaymentView(View):
 			managed=True,
 		)
 
-		# print result
-		# grab the account.id
-		user.stripe_id = result.id
+		# store the acct_xxxxxxxx
+		user.stripe_account_id = result.id
 		print("===========")
 		print("user stripe account id: " + result.id)
 		print("===========")
-		# print(result.keys()) 		# <built-in method keys of Account object at 0x1060bd868>
 
+		# user.save()
 
-		# user.stripe_secret_key = result.keys
-
-		# user.stripe_publishable_key = result.keys.publishable
-		user.save()
-
-		# context = {
-		# 	'stripe_id': self.stripe_id,
-		# 	'stripe_secret_key': self.stripe_secret_key,
-		# 	'stripe_publishable_key': self.stripe_publishable_key,
-		# }
 
 		# retrieve the account and sign the ToS
 		account = stripe.Account.retrieve(result.id)
 		account.tos_acceptance.date = int(time.time())
 		account.tos_acceptance.ip = '67.160.206.40' # Depends on what web framework you're using
 		account.save()
-
 		
-		# grab the CC data from form submission
-		# exp_month = request.POST['exp_month']
-		# exp_year = request.POST['exp_year']
-		# cc_number = request.POST['cc_number']
-		# cc_cvc = request.POST['cc_cvc']
 
-
-		# # attach CC to Account
-		# credit_card = account.external_accounts.create(
-		# 	external_account={
-		# 		'object': 'card',
-		# 		'exp_month': exp_month,
-		# 		'exp_year': exp_year,
-		# 		'number': cc_number,
-		# 		'currency': 'usd',
-		# 		'cvc': cc_cvc,
-		# 	}
-		# )
-		
+		# grab the stripeToken
 		stripe_cc_token = request.POST['stripeToken']
-		print("==========")
-		print("the account stripe token is: " + stripe_cc_token)
-		print("==========")
-		account.external_accounts.create(external_account=stripe_cc_token)
 
-		account.save()
+		print("==========")
+		print("the credit card stripe token is: " + stripe_cc_token)
+		print("==========")
 
-		# print credit_card
+		# use the stripeToken to create a Customer w/ credit card
+		customer = stripe.Customer.create(
+		  description="Stripe account for: " + user.first_name + " " + user.last_name,
+		  source=stripe_cc_token,
+		)
+
+		# save the card_xxxxxxx to the user (credit card)
+		user.stripe_card_id = customer.sources.data[0].id
+
+
 		# grab the bank account data from form submission
 		"""
 		"id": "ba_17UnXx2eZvKYlo2CxDVhPoUp",
@@ -274,10 +252,11 @@ class RegisterPaymentView(View):
 		bank_name = request.POST['bank_name']
 		routing_number = request.POST['routing_number']
 
+		# attach a bank account to the 'managed account'
 		bank_account = account.external_accounts.create(
 			external_account={
 				'object': 'bank_account',
-				'account': bank_account_number,
+				'account_number': bank_account_number,
 				'account_holder_type': 'individual',
 				'bank_name': bank_name,
 				'country': 'US',
@@ -288,6 +267,14 @@ class RegisterPaymentView(View):
 		)
 
 		print bank_account
+
+		user.stripe_bank_account_id = bank_account.id
+		
+		user.save()
+		# store the bank_id
+		# ba_17Umvt2eZvKYlo2CdPjUT86K
+		# account = stripe.Account.retrieve("acct_1032D82eZvKYlo2C")
+		# bank_account = account.external_accounts.retrieve("ba_17Umvt2eZvKYlo2CdPjUT86K")
 
 		return HttpResponseRedirect('%s'%(reverse('accounts:dashboard',args=[user.id])))
 

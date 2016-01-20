@@ -34,7 +34,7 @@
 	    Stripe.card.createToken($form, stripeResponseHandler);
 
 	    // Prevent the form from submitting with the default action
-	    return false;
+	    // return false;
 	  });
 	});
 
@@ -55,7 +55,6 @@
 	    $form.get(0).submit();
 	  }
 	};
-
 	
 
 {% endblock %}
@@ -101,8 +100,10 @@
 					<input type="text" class="form-control"  data-stripe="exp-month" placeholder="expiration month"/>
 					<input type="text" class="form-control"  data-stripe="exp-year" placeholder="expiration year"/>
 				</div>
-				<inpu type="hidden" data-stripe="currency" value="USD" />
-				<input type="hidden" name="stripeToken" id="stripeToken" />
+				<div class="form-group">
+					<input type="text" class="form-control" data-stripe="currency" value="usd" />
+				</div>
+
 				<div class="form-group">
 					<input type="submit" id="complete_registration" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
 				</div>
