@@ -16,27 +16,27 @@
 	var socket = io.connect('http://127.0.0.1:3000');
 
 	$("#complete_registration").on("click", function(){
-			var user_id = {{ request.user.id }};
-			socket.emit('assign-socket-id', {user_id:user_id});
+		var user_id = {{ request.user.id }};
+		socket.emit('assign-socket-id', {user_id:user_id});
 
 
 	});
 
 	// stripe
 
-	jQuery(function($) {
-	  $('#payment-form').submit(function(event) {
-	    var $form = $(this);
+	 jQuery(function($) {
+	   $('#payment-form').submit(function(event) {
+	     var $form = $(this);
 
 	    // Disable the submit button to prevent repeated clicks
-	    $form.find('#complete_registration').prop('disabled', true);
+	     $form.find('#complete_registration').prop('disabled', true);
 
-	    Stripe.card.createToken($form, stripeResponseHandler);
+	     Stripe.card.createToken($form, stripeResponseHandler);
 
 	    // Prevent the form from submitting with the default action
-	    // return false;
-	  });
-	});
+	    return false;
+	   });
+	 });
 
 	function stripeResponseHandler(status, response) {
 	  var $form = $('#payment-form');

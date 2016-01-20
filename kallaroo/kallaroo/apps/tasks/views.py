@@ -299,7 +299,13 @@ def send_payment(request):
 		print("===============")
 		print("the contractor account is: " + contractor_account.id)
 		print("===============")
+		
+
+		### calculate the application_fee ###
+
+
 		# charge the client
+
 		"""
 		customer => who is going to be charged (i.e. passenger)
 		destination => who is receiving the money (i.e. driver)
@@ -317,7 +323,7 @@ def send_payment(request):
 		print("payment sent: " + result.id)
 		print("=============")
 
-		if result.status == "succeeded":
+		if result.id:
 			task.task_status = "Paid"
 			task.save()
 			messages.success(request, "Your payment has been sent.")

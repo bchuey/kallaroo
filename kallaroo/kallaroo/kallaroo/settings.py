@@ -167,3 +167,16 @@ Braintree Keys
 BRAINTREE_MERCHANT_ID = "dfzjdkts5fsqyqtj"
 BRAINTREE_PUBLIC = "dkmkn9p3c543dhnw"
 BRAINTREE_PRIVATE = "00804f368179a38e7a692663858a47b0"
+
+"""
+===========
+Stripe Keys
+===========
+"""
+STRIPE_TEST_SECRET_KEY = "sk_test_BvXnJuHaPBDFDR0nou3Qq4Qn"
+STRIPE_TEST_PUBLISHABLE_KEY = "pk_test_ibg1UGcODKHiCZeMSEuMxaCt"
+STRIPE_LIVE_SECRET_KEY = "sk_live_BvBOUPNp4anAh96LcsQRrOGr"
+STRIPE_LIVE_PUBLISHABLE_KEY = "pk_live_bQeilRqiPAnWXSeWENpc8G39"
+
+
+
