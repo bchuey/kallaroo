@@ -20,6 +20,7 @@ from django.contrib import messages
 from django.conf import settings
 import redis
 import json
+import stripe
 
 import braintree
 
@@ -271,26 +272,64 @@ def end_task(request):
 
 def send_payment(request):
 	if request.method == "POST":
+		stripe.api_key = 'sk_test_BvXnJuHaPBDFDR0nou3Qq4Qn'
+
 		task = Task.objects.get(id=request.POST['task_id'])
 		payment = task.final_payment
-		user = request.user
-		result = braintree.Transaction.sale({
-			"amount": payment,
-			"payment_method_token": user.payment_method_token,
-			"customer_id": user.braintree_id,
-			"options": {
-				"submit_for_settlement": True
-			}
-		})
-		if result.is_success:
+
+		client = request.user
+		contractor = User.objects.get(id=request.POST['contractor_id'])
+		
+		stripe_token = request.POST['stripeToken']
+
+		client_account = stripe.Account.retrieve(client.stripe_account_id)
+		client_bank_account = account.external_accounts.retrieve(client.stripe_bank_account_id)
+
+		contractor_account = stripe.Account.retrieve(contractor.stripe_account_id)
+		contractor_bank_account = stripe.Account.retrieve(contractor.stripe_bank_account_id)
+
+		# charge the client
+		"""
+		customer => who is going to be charged (i.e. passenger)
+		destination => who is receiving the money (i.e. driver)
+		"""
+
+		result = stripe.Charge.create(
+		  amount=,
+		  currency='usd',
+		  # source=stripe_token,
+		  application_fee=,
+		  customer=client_account,
+		  destination=contractor_account,
+		)
+
+		if result.status == "succeeded":
 			task.task_status = "Paid"
 			task.save()
 			messages.success(request, "Your payment has been sent.")
 			return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
 		else:
-			# messages.error(request, "Oops, something went wrong with your payment.")
 			messages.warning(request, '%s'%(result.message))
 			return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
+
+
+		# result = braintree.Transaction.sale({
+		# 	"amount": payment,
+		# 	"payment_method_token": user.payment_method_token,
+		# 	"customer_id": user.braintree_id,
+		# 	"options": {
+		# 		"submit_for_settlement": True
+		# 	}
+		# })
+		# if result.is_success:
+		# 	task.task_status = "Paid"
+		# 	task.save()
+		# 	messages.success(request, "Your payment has been sent.")
+		# 	return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
+		# else:
+		# 	# messages.error(request, "Oops, something went wrong with your payment.")
+		# 	messages.warning(request, '%s'%(result.message))
+		# 	return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
 
 
 
