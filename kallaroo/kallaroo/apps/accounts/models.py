@@ -5,6 +5,7 @@ from ..categories.models import Subcategory
 from django.conf import settings
 from django.db.models.signals import pre_save, post_save
 from django.conf import settings
+from django.core.validators import RegexValidator
 import braintree
 import stripe
 
@@ -64,6 +65,11 @@ class User(AbstractBaseUser):
 	profile_pic = models.ImageField(null=True, blank=True)
 	subcategory = models.ForeignKey(Subcategory, max_length=255, null=True, blank=True)
 	rating = models.IntegerField(null=True, blank=True)
+	
+	# phone number for Twilio
+	phone_regex = RegexValidator(regex=r'', message="Phone numbers must be in +9999999999 format")
+	phone_number = models.CharField(max_length=12, validators=[phone_regex], blank=True)
+
 
 	# address
 	address = models.CharField(max_length=255, null=True, blank=True)

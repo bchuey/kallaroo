@@ -326,6 +326,27 @@ def send_payment(request):
 		if result.id:
 			task.task_status = "Paid"
 			task.save()
+
+			"""
+			Send a text message using Twilio API 
+			"""
+			from twilio.rest import TwilioRestClient
+			ACCOUNT_SID = "ACde41753487f3b3ba0e540c5ec17e644b"
+			AUTH_TOKEN = "90824f0b9e37b14403b47a5191e84276"
+
+			client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+
+			text_msg = client.messages.create(
+				body="You have been paid",
+				to="+14158102735",
+				from_="+15005550006",
+			)
+
+			print("===========")
+			print("the current SMS SID is: " + text_msg.sid)
+			print("===========")
+			print(text_msg.body)
+
 			messages.success(request, "Your payment has been sent.")
 			return HttpResponseRedirect('%s'%(reverse('tasks:task_detail_active',args=[task.id])))
 		else:
