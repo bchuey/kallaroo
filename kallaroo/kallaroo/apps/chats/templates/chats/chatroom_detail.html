@@ -61,7 +61,8 @@
 			<h4>Participants in the chatroom:</h4>
 			<div class="col-md-6">
 				<img src="">
-				<h4> name </h4>
+				<h4> {{ object.creator.username }} </h4>
+				<a href="{% url 'accounts:dashboard' object.creator.id %}">Return Home</a>
 			</div>
 			<div class="col-md-6">
 				<img src="">

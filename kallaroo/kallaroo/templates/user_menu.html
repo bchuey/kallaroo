@@ -4,7 +4,7 @@
       <li><a href="{% url 'accounts:dashboard' user.id %}" class="sidenav-menu-item sidenav-stacked">Dashboard</a></li>
       <li><a href="{% url 'accounts:profile' user.id %}"  class="sidenav-link sidenav-menu-item sidenav-stacked">Profile</a></li>
       <li><a href="{% url 'accounts:my_tasks' user.id %}"  class="sidenav-link sidenav-menu-item sidenav-stacked">Tasks</a></li>
-      <li><a href="#" class="sidenav-link sidenav-menu-item sidenav-stacked">Chats</a></li>
+      <li><a href="{% url 'accounts:all_chats' user.id %}" class="sidenav-link sidenav-menu-item sidenav-stacked">Chats</a></li>
       <li><a href="#" class="sidenav-link sidenav-menu-item sidenav-stacked">Settings</a></li>
       <li><a href="#" class="sidenav-link sidenav-menu-item sidenav-stacked">Support</a></li>
       <li><a href="#" class="sidenav-link sidenav-menu-item sidenav-stacked">Contact</a></li>

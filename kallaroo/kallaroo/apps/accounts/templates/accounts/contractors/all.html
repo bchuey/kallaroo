@@ -29,7 +29,15 @@
 					{% if contractor.is_online %}
 					<p><span class="glyphicon glyphicon-fire"></span> <span>Online Now</span>
 					{% endif %}
-					<p><a href="{% url 'accounts:contractor_profile' contractor.id %}" class="btn-orange btn-orange-effect">View Profile</a><button type="button" class="btn-blue btn-blue-effect pull-right" id="create-chat">Chat</button></p>
+					<p>
+						<a href="{% url 'accounts:contractor_profile' contractor.id %}" class="btn-orange btn-orange-effect">View Profile</a>
+						<form action="{% url 'chats:create-chatroom' %}" method="POST">
+							{% csrf_token %}
+							<input type="hidden" name="user_id" value="{{ request.user.id }}" />
+							<input type="hidden" name="contractor_id" value="{{ contractor.id }}" />
+							<input type="submit" value="Chat" class="btn-blue btn-blue-effect" />
+						</form>
+					</p>
 
 				</div>
 			</div>

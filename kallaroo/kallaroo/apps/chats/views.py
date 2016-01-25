@@ -11,7 +11,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 # from redis_collections import Dict
 from django.utils.encoding import smart_text
-
+from django.db.models import Q
 from django.core import serializers
 import json
 import redis
@@ -36,9 +36,23 @@ class ChatroomDetailView(DetailView):
 		context['msgs'] = self.object.chat_set.all()
 		return context
 
+class MyChatroomsListView(ListView):
+	model = Chatroom
+	template_name = 'accounts/partials/users/partials/chats/all.html'
 
-
-
+	def get(self, request, *args, **kwargs):
+		user = User.objects.get(id=request.session['user_id'])
+		try:
+			chatrooms = Chatroom.objects.filter(Q(creator=user) | Q(participant=user))
+			context = {
+				'chatrooms': chatrooms,
+			}
+			return render(request, self.template_name, context)
+		except:
+			context = {
+				'msg': "No chatrooms available",
+			}
+			return render(request, self.template_name, context)
 
 """
 1.)create_chatroom view is currently working

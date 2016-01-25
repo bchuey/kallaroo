@@ -1,0 +1,28 @@
+{% block content %}
+<div class="col-md-8">
+	{% if chatrooms %}
+	<table class="table">
+		<thead>
+			<th>Chatroom</th>
+			<th>Creator</th>
+			<th>Participant</th>
+			<th></th>
+		</thead>
+		<tbody>
+		{% for chatroom in chatrooms %}
+			<tr>
+				<td><a href="#">Chatroom #{{ chatroom.id }}</a></td>
+				<td>{{ chatroom.creator.username }}</td>
+				<td>{{ chatroom.participant.username }}</td>
+				<td>Join</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<h3>{{ msg }}</h3>
+	{% endif %}
+</div>
+	
+
+{% endblock %}

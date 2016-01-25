@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from . import views
 from ..tasks.views import AllTaskListView, ActiveTaskListView, OpenTaskListView, CompletedTaskListView
+from ..chats.views import MyChatroomsListView
 
 app_name = 'accounts'
 
@@ -36,4 +37,6 @@ urlpatterns = [
 	url(r'^(?P<pk>\d+)/tasks/active/$', ActiveTaskListView.as_view(), name='active_tasks'),
 	url(r'^(?P<pk>\d+)/tasks/open/$', OpenTaskListView.as_view(), name='open_tasks'),
 	url(r'^(?P<pk>\d+)/tasks/completed/$', CompletedTaskListView.as_view(), name='completed_tasks'),
+
+	url(r'^(?P<pk>\d+)/chats/all/$', MyChatroomsListView.as_view(), name='all_chats'),
 ] 
