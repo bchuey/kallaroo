@@ -10,13 +10,13 @@ Registration
 """
 
 class UserCreationForm(forms.ModelForm):
-	username = forms.CharField(label='Username', max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))
-	email = forms.EmailField(label='Email', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
-	first_name = forms.CharField(label='First Name', max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))
-	last_name = forms.CharField(label='Last Name', max_length=50, widget=forms.TextInput(attrs={'class':'form-control'}))
+	username = forms.CharField(label='Username', max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'choose a username'}))
+	email = forms.EmailField(label='Email', max_length=255, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'enter a valid email address'}))
+	first_name = forms.CharField(label='First Name', max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'your first name'}))
+	last_name = forms.CharField(label='Last Name', max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'your last name'}))
 	profile_pic = forms.ImageField(label='Profile Picture', widget=forms.ClearableFileInput(attrs={'class':'form-control'}))
-	password1 = forms.CharField(label='Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control'}))
-	password2 = forms.CharField(label='Confirm Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control'}))
+	password1 = forms.CharField(label='Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'create a password'}))
+	password2 = forms.CharField(label='Confirm Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control','placeholder':'re-enter your password'}))
 	is_contractor = forms.BooleanField(label='Are you a contractor?', required=False, widget=forms.CheckboxInput())
 	subcategory = forms.ModelChoiceField(label='Subcategory', queryset=Subcategory.objects.all(), widget=forms.Select(attrs={'class':'form-control'}), required=False)
 
@@ -55,7 +55,7 @@ class UserCreationForm(forms.ModelForm):
 # 		fields = ('street_number', 'street_address', 'city', 'state', 'zipcode')
 
 class UserAddressForm(forms.ModelForm):
-	address = forms.CharField(label='ADDRESS', widget=forms.TextInput(attrs={'class':'form-control'}))
+	address = forms.CharField(label='ADDRESS', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'enter your location'}))
 
 	class Meta:
 		model = User
@@ -103,9 +103,9 @@ class StripePaymentForm(forms.Form):
 	# exp_month = forms.ChoiceField(label='Exp Month', widget=forms.Select(attrs={'class':'form-control','data-stripe':'exp-month'}), choices=MONTH_CHOICES)
 	# exp_year = forms.IntegerField(label='Exp Year', widget=forms.NumberInput(attrs={'class':'form-control','data-stripe':'exp-year'}))
 
-	bank_account = forms.CharField(label='Bank Account #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
-	bank_name = forms.CharField(label='Bank Name', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
-	routing_number = forms.CharField(label='Routing #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
+	bank_account = forms.CharField(label='Bank Account #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'please enter your bank account #'}))
+	bank_name = forms.CharField(label='Bank Name', max_length=255, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder': 'please enter the name of your bank'}))
+	routing_number = forms.CharField(label='Routing #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'please enter your routing #'}))
 	
 	# clean the info somehow
 
@@ -118,8 +118,8 @@ Login
 
 
 class LoginForm(forms.ModelForm):
-	email = forms.EmailField(label='Email', max_length=255, widget=forms.TextInput(attrs={'class':'form-control'}))
-	password = forms.CharField(label='Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control'}))
+	email = forms.EmailField(label='Email', max_length=255, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'please enter your email'}))
+	password = forms.CharField(label='Password', max_length=255, widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'please enter your password'}))
 
 	class Meta:
 		model = User

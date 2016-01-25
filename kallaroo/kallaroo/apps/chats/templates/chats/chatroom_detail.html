@@ -11,6 +11,24 @@
 
 	socket.emit("room-number", {room_id: room_id});
 
+	var entry_el = $("#msg");
+
+	entry_el.keypress(function(event){
+		if(event.keyCode != 13) return;
+		var user_id = {{ request.user.id }}
+		var msg = $("#msg").val();
+		var chatroom_id = {{ object.id }};
+
+		if(msg) {
+			socket.emit("send-message", {
+				user_id: user_id,
+				msg: msg,
+				chatroom_id: chatroom_id,
+			});
+			// console.log(msg);
+		}
+		$("#msg").val('');
+	});
 
 	// create javascript event listener
 	$("#send-msg-btn").click(function(){
@@ -42,7 +60,10 @@
 		//console.log(obj.author.email);
 		//console.log(obj.written_at);
 		//$("#chats").append("<p>" + context + "</p>");
-		$('#chats').append("<div class='media'><div class='media-left'><span class='glyphicon glyphicon-user glyphicon-lg'></span></div><div class='media-body'><div class='well'><h4>" + obj.author.email + "<span class='pull-right'>" + obj.written_at + "</span></h4><p>" + obj.text + "</p></div></div></div>");
+
+		console.log(obj.profile_pic);
+
+		$('#chats').append("<div class='media'><div class='media-left'><img src='" + obj.author.profile_pic + "' class='img-circle' height='125' width='125' /></div><div class='media-body'><div class='well'><h4>" + obj.author.email + "<span class='pull-right'>" + obj.written_at + "</span></h4><p>" + obj.text + "</p></div></div></div>");
 		
 	});
 
@@ -59,14 +80,16 @@
 		<div class="col-md-8 col-md-push-2 text-center">
 			<h3>Welcome to chatroom #{{ object.id }}!</h3>
 			<h4>Participants in the chatroom:</h4>
-			<div class="col-md-6">
-				<img src="">
+			<div class="col-xs-6">
+				<img src="{{ object.creator.profile_pic.url }}" class="img-circle" height="125" width="125">
 				<h4> {{ object.creator.username }} </h4>
 				<a href="{% url 'accounts:dashboard' object.creator.id %}">Return Home</a>
 			</div>
-			<div class="col-md-6">
-				<img src="">
-				<h4> name </h4>
+			<div class="col-xs-6">
+				{% if object.participant %}
+					<img src="{{ object.participant.profile_pic.url }}" class="img-circle" height="125" width="125">
+					<h4> {{ object.participant.username }} </h4>
+				{% endif %}
 			</div>
 		</div>
 	</div>
@@ -78,7 +101,8 @@
 				{% for msg in msgs %}
 					<div class="media">
 						<div class="media-left">
-							<span class="glyphicon glyphicon-user glyphicon-lg"></span>
+
+							<img src="{{ msg.author.profile_pic.url }}" class="img-circle" height="75" width="75" />
 						</div>
 						<div class="media-body">
 							<div class="well">
@@ -90,12 +114,12 @@
 				{% endfor %}
 			{% endif %}
 		</div>
-		<div class="form-inline col-md-8 col-md-push-2 section-static">
-			<div class="form-group">
-				<div class="col-md-12">
+		<div class="col-md-8 col-md-push-2 section-static">
+			<div class="col-md-12">
+				<div class="form-group">
 					<input type="text" id="msg" class="form-control" />	
-					<button type="button" id="send-msg-btn" class="btn-blue btn-blue-effect">Send</button>
 				</div>
+				<button type="button" id="send-msg-btn" class="btn-blue btn-blue-effect col-xs-12">Send</button>
 			</div>
 		</div>
 	</div>

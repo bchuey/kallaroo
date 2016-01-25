@@ -46,13 +46,70 @@
 			<form action="{% url 'accounts:register_profile' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
 				{% csrf_token %}
 				<div class="col-md-12 task-field-container">
-					{% for field in form %}
-						<div class="form-group">
-							{{ field.label }}
-							{{ field }}
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-envelope"></i>
+							</div>
+							{{ form.email }}
 						</div>
-					{% endfor %}
-					
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-user"></i>
+							</div>
+							{{ form.username }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-user"></i>
+							</div>
+							{{ form.first_name }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-user"></i>
+							</div>
+							{{ form.last_name }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-key"></i>
+							</div>
+							{{ form.password1 }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-unlock-alt"></i>
+							</div>
+							{{ form.password2 }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-file-picture-o"></i>
+							</div>
+							{{ form.profile_pic }}
+						</div>
+					</div>
+					<div class="form-group">
+						{{ form.is_contractor.label }}
+						{{ form.is_contractor }}
+
+					</div>
+					<div class="form-group">
+						{{ form.subcategory }}
+					</div>
 				</div>
 				<input type="submit" value="Continue" id="add_profile" class="btn-blue btn-blue-effect col-xs-12" />
 			</form>
