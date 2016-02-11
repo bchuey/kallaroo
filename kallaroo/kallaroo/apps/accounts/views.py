@@ -60,10 +60,15 @@ class RegisterProfileView(View):
 		if request.method == "POST":
 			if form.is_valid():
 
-				username = request.POST['username']
-				email = request.POST['email']
-				first_name = request.POST['first_name']
-				last_name = request.POST['last_name']
+				# username = request.POST['username']
+				# email = request.POST['email']
+				# first_name = request.POST['first_name']
+				# last_name = request.POST['last_name']
+
+				username = form.cleaned_data.get('username')
+				email = form.cleaned_data.get('email')
+				first_name = form.cleaned_data.get('first_name')
+				last_name = form.cleaned_data.get('last_name')
 				password = form.cleaned_data.get('password1')
 
 				user = User.objects.create_user(email, username, first_name, last_name, password)
@@ -126,7 +131,7 @@ class RegisterAddressView(View):
 
 				# user = User.objects.get(id=request.session['user_id'])
 				# address.user = user
-				user = User.objects.get(id=request.session['user_id'])
+				user = request.user
 				user.address = request.POST['address']
 				# address.save()
 				user.save()
@@ -141,7 +146,7 @@ class RegisterPaymentView(View):
 
 	def get(self, request, *args, **kwargs):
 		
-		user = User.objects.get(id=request.session['user_id'])
+		user = request.user
 		# braintree_client_token = user.braintree_client_token
 		context = {
 			# 'braintree_client_token': braintree_client_token,
@@ -153,7 +158,7 @@ class RegisterPaymentView(View):
 
 	def post(self, request, *args, **kwargs):
 		# print(request.POST.get('payment_method_nonce'))
-		user = User.objects.get(id=request.session['user_id'])
+		user = request.user
 		# user.payment_method_nonce = request.POST.get('payment_method_nonce')
 		# user.save()
 
@@ -369,7 +374,7 @@ class UserTaskView(View):
 
 	def get(self, request, *args, **kwargs):
 		# context = super(UserTaskView ,self).get_context_data(**kwargs)
-		user = User.objects.get(id=request.session['user_id'])
+		user = self.request.user
 		# context['form'] = self.form()
 		# context['tasks'] = Task.objects.filter(user=user)
 		tasks = Task.objects.filter(user=user)

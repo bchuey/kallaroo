@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, ReadOnlyPasswordHashField
 from .models import User, UserAddress
 from ..categories.models import Subcategory
-
+import re
 """
 ==============
 Registration
@@ -23,6 +23,44 @@ class UserCreationForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = ('email', 'username', 'first_name', 'last_name', 'password1', 'password2', 'profile_pic', 'is_contractor', 'subcategory')
+
+	def clean_username(self):
+		username = self.cleaned_data.get('username')
+		all_current_users = User.objects.all()
+		for user in all_current_users:
+			if username == user.username:
+				raise forms.ValidationError("Sorry, that username is already taken")
+				break
+
+		return username
+
+	def clean_email(self):
+		EMAIL_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b')
+		email = self.cleaned_data.get('email')
+		all_current_users = User.objects.all()
+		for user in all_current_users:
+			if email == user.email:
+				raise forms.ValidationError("Uh oh, this email is already registered. Please enter another one.")
+			
+			if EMAIL_REGEX.match(email):
+				return email
+			else:
+				raise forms.ValidationError("Invalid email. Please try again.")
+
+	def clean_first_name(self):
+		NAME_REGEX = re.compile(r'[a-zA-Z]*')
+		first_name = self.cleaned_data.get('first_name')
+		if not NAME_REGEX.match(first_name):
+			raise forms.ValidationError("Invalid name. Your first name must only include letters.")
+		return first_name
+
+	def clean_last_name(self):
+		NAME_REGEX = re.compile(r'[a-zA-Z]*')
+		last_name = self.cleaned_data.get('last_name')
+		if not NAME_REGEX.match(last_name):
+			raise forms.ValidationError("Invalid name. Your first name must only include letters.")
+		return last_name
+
 
 	def clean_password2(self):
 		password1 = self.cleaned_data.get('password1')
