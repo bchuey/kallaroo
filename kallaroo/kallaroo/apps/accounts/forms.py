@@ -26,26 +26,28 @@ class UserCreationForm(forms.ModelForm):
 
 	def clean_username(self):
 		username = self.cleaned_data.get('username')
-		all_current_users = User.objects.all()
-		for user in all_current_users:
-			if username == user.username:
-				raise forms.ValidationError("Sorry, that username is already taken")
-				break
+		
+		try:
+			user = User.objects.all().filter(username=username)
+			if user:
+				raise forms.ValidationError("Sorry, an account with that username has already been registered.")
+		except User.DoesNotExist:
+			return username
 
-		return username
+
 
 	def clean_email(self):
 		EMAIL_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b')
 		email = self.cleaned_data.get('email')
-		all_current_users = User.objects.all()
-		for user in all_current_users:
-			if email == user.email:
-				raise forms.ValidationError("Uh oh, this email is already registered. Please enter another one.")
-			
-			if EMAIL_REGEX.match(email):
-				return email
-			else:
+		
+		try:
+			user = User.objects.all().filter(email=email)
+			if user:
+				raise forms.ValidationError("Sorry, this email has already been registered.")
+		except User.DoesNotExist:
+			if not EMAIL_REGEX.match(email):
 				raise forms.ValidationError("Invalid email. Please try again.")
+			return email
 
 	def clean_first_name(self):
 		NAME_REGEX = re.compile(r'[a-zA-Z]*')
@@ -76,21 +78,57 @@ class UserCreationForm(forms.ModelForm):
 			user.save()
 		return user
 
-# class UserAddressForm(forms.ModelForm):
-# 	STATE_CHOICES = (
-# 		('AZ', 'AZ'),
-# 		('CA', 'CA'),
-# 		('TX', 'TX'),
-# 	)
-# 	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control'}))
-# 	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control'}))
-# 	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control'}))
-# 	state = forms.ChoiceField(label='State', choices=STATE_CHOICES, widget=forms.Select(attrs={'class':'form-control'}))
-# 	zipcode = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control'}))
+class FullUserAddressForm(forms.ModelForm):
+	STATE_CHOICES = (
+		('AZ', 'AZ'),
+		('CA', 'CA'),
+		('TX', 'TX'),
+	)
+	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control'}))
+	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control'}))
+	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control'}))
+	state = forms.ChoiceField(label='State', choices=STATE_CHOICES, widget=forms.Select(attrs={'class':'form-control'}))
+	zipcode = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control'}))
 
-# 	class Meta:
-# 		model = UserAddress
-# 		fields = ('street_number', 'street_address', 'city', 'state', 'zipcode')
+	class Meta:
+		model = UserAddress
+		fields = ('street_number', 'street_address', 'city', 'state', 'zipcode')
+
+	def clean_street_number(self):
+		street_number = self.cleaned_data.get('street_number')
+		STREET_NUMBER_REGEX = re.compile(r'[0-9]*')
+		if not STREET_NUMBER_REGEX.match(street_number):
+			raise forms.ValidationError("Street Number can only contain digits 0-9")
+		return street_number
+
+
+	def clean_street_address(self):
+		street_address = self.cleaned_data.get('street_address')
+		STREET_ADDRESS_REGEX = re.compile(r'[a-zA-Z\-]*')
+		if not STREET_ADDRESS_REGEX.match(street_address):
+			raise forms.ValidationError("Street Address can only contain lowercase/uppercase letters, and dashes.")
+		return street_address
+
+
+	def clean_city(self):
+		city = self.cleaned_data.get('city')
+		CITY_REGEX = re.compile(r'[a-zA-Z\-]*')
+		if not CITY_REGEX.match(street_address):
+			raise forms.ValidationError("Valid city names can only contain lowercase/uppercase letters, and dashes.")
+		return city
+
+	def clean_state(self):
+		pass
+
+	def clean_zipcode(self):
+		zipcode = self.cleaned_data.get('zipcode')
+		NINE_DIGIT_ZIP_REGEX = re.compile(r'[0-9]{5}(\-[0-9]{4})?$')
+		FIVE_DIGIT_ZIP_REGEX = re.compile(r'[0-9]{5}')
+		# 99577-0727
+		if not NINE_DIGIT_ZIP_REGEX.match(zipcode) or not FIVE_DIGIT_ZIP_REGEX.match(zipcode):
+			raise forms.ValidationError("")
+		return zipcode
+
 
 class UserAddressForm(forms.ModelForm):
 	address = forms.CharField(label='ADDRESS', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'enter your location'}))

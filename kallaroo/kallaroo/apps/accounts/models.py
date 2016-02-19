@@ -74,13 +74,14 @@ class User(AbstractBaseUser):
 	# address
 	address = models.CharField(max_length=255, null=True, blank=True)
 
+
 	# Braintree unique ID
 	# braintree_id = models.CharField(max_length=255, null=True, blank=True)
 	# braintree_client_token = models.CharField(max_length=2000, null=True, blank=True)
 	# payment_method_nonce = models.CharField(max_length=255, null=True, blank=True)
 	# payment_method_token = models.CharField(max_length=255, null=True, blank=True)
 
-	# Stripe (Managed Accounts)
+	### Stripe (Managed Accounts) ###
 	date_of_birth = models.DateField(auto_now_add=False, auto_now=False, null=True, blank=True)
 	stripe_account_id = models.CharField(max_length=255, null=True, blank=True)
 	stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
@@ -235,11 +236,6 @@ post_save.connect(method_name, sender=another_method_or_class_name)
 # 		return context
 
 
-
-
-
-
-
 class UserAddressManager(models.Manager):
 	def create_address(self, street_number, street_address, city, state, zipcode):
 
@@ -270,7 +266,7 @@ class UserAddress(models.Model):
 	objects = UserAddressManager()
 
 	class Meta:
-		db_table = 'user_addresses'
+		db_table = 'addresses'
 
 	def __str__(self):
 		return self.get_address()

@@ -43,7 +43,7 @@
 			<span class="glyphicon glyphicon-home glyphicon-md" ></span> <span>2. Add Address</span>
 		</div>
 		<div class="col-md-4 section-static text-center">
-			<span class="glyphicon glyphicon-random glyphicon-md"></span>  <span>3. Payment Method</span>
+			<span class="fa fa-credit-card glyphicon-md"></span> <span> 3. Payment Method</span>
 		</div>
 	</div>
 </div>
@@ -60,6 +60,25 @@
 									<i class="fa fa-map-marker"></i>
 								</div>
 								{{ form.address }}
+							</div>
+						</div>
+
+				</div>
+				<input type="submit" value="Continue" id="add_address" class="btn-blue btn-blue-effect col-xs-12" />
+			</form>
+		</div>
+	</div>
+</div>
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form action="{% url 'accounts:register_address' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+				{% csrf_token %}
+				<div class="col-md-12 task-field-container">
+
+						<div class="form-group">
+							<div class="input-group">
+								{{ form2.as_p }}
 							</div>
 						</div>
 

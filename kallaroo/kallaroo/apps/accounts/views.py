@@ -4,7 +4,7 @@ from django.views.generic import View, TemplateView, ListView, DetailView
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
-from .forms import UserCreationForm, UserChangeForm, LoginForm, UserAddressForm, StripePaymentForm
+from .forms import UserCreationForm, UserChangeForm, LoginForm, FullUserAddressForm, UserAddressForm, StripePaymentForm
 from .models import User, UserAddress
 from ..categories.models import Subcategory
 from ..tasks.models import Task
@@ -50,14 +50,9 @@ class RegisterProfileView(View):
 
 	def post(self, request, *args, **kwargs):
 
-		form = UserCreationForm(request.POST, request.FILES)
-
-		context = {
-			'form': form,
-		}
-
 		
 		if request.method == "POST":
+			form = UserCreationForm(request.POST, request.FILES)
 			if form.is_valid():
 
 				# username = request.POST['username']
@@ -98,47 +93,57 @@ class RegisterProfileView(View):
 				user.save()
 				return HttpResponseRedirect('%s'%(reverse('accounts:register_address')))
 			else:
+				context = {
+					'form': form,
+				}
+
 				print("uh oh, something went wrong")
 				return render(request, self.template_name, context)
 
 class RegisterAddressView(View):
 	model = UserAddress
 	form = UserAddressForm
+	form2 = FullUserAddressForm
 	template_name = 'accounts/register_user/step2.html'
 
 	def get(self, request, *args, **kwargs):
 		
 		form = self.form()
+		form2 = self.form2()
 
 		context = {
 			'form': form,
+			'form2': form2, 
 		}
 
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
 
-		form = UserAddressForm(request.POST)
+		# form = UserAddressForm(request.POST)
+		form2 = FullUserAddressForm(request.POST)
+
 		if request.method == "POST":
-			if form.is_valid():
-				# street_number = request.POST['street_number']
-				# street_address = request.POST['street_address']
-				# city = request.POST['city']
-				# state = request.POST['state']
-				# zipcode = request.POST['zipcode']
+			if form2.is_valid():
+				print form2.cleaned_data
+			# 	# street_number = request.POST['street_number']
+			# 	# street_address = request.POST['street_address']
+			# 	# city = request.POST['city']
+			# 	# state = request.POST['state']
+			# 	# zipcode = request.POST['zipcode']
 
-				# address = UserAddress.objects.create_address(street_number=street_number, street_address=street_address, city=city, state=state, zipcode=zipcode)
+			# 	# address = UserAddress.objects.create_address(street_number=street_number, street_address=street_address, city=city, state=state, zipcode=zipcode)
 
-				# user = User.objects.get(id=request.session['user_id'])
-				# address.user = user
-				user = request.user
-				user.address = request.POST['address']
-				# address.save()
-				user.save()
+			# 	# user = User.objects.get(id=request.session['user_id'])
+			# 	# address.user = user
+			# 	user = request.user
+			# 	user.address = request.POST['address']
+			# 	# address.save()
+			# 	user.save()
 
-				return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
-			else:
-				return render(request, self.template_name, context)
+			# 	return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
+			# else:
+			# 	return render(request, self.template_name, context)
 
 class RegisterPaymentView(View):
 	model = User
