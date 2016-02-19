@@ -4,4 +4,4 @@ requirements.txt
 __pycache__
 bin
 lib
-
+*.rdb
