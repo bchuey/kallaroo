@@ -1,6 +1,5 @@
 requirements.txt
-*.pyo
-*.pyc
+*.py[co]
 __pycache__
 bin
 lib
