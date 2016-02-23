@@ -237,14 +237,14 @@ post_save.connect(method_name, sender=another_method_or_class_name)
 
 
 class UserAddressManager(models.Manager):
-	def create_address(self, street_number, street_address, city, state, zipcode):
+	def create_address(self, street_number, street_address, city, state, postal_code):
 
 		address = self.model(
 			street_number=street_number,
 			street_address=street_address,
 			city=city,
 			state=state,
-			zipcode=zipcode,
+			postal_code=postal_code,
 		)
 
 		address.save(using=self._db)
@@ -260,7 +260,7 @@ class UserAddress(models.Model):
 	street_address = models.CharField(max_length=60)
 	city = models.CharField(max_length=60)
 	state = models.CharField(max_length=2, choices=STATE_CHOICES, default='AZ')
-	zipcode = models.IntegerField()
+	postal_code = models.IntegerField()
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
 	objects = UserAddressManager()
@@ -272,4 +272,4 @@ class UserAddress(models.Model):
 		return self.get_address()
 
 	def get_address(self):
-		return "%s %s, %s, %s, %s" %(self.street_number, self.street_address, self.city, self.state, self.zipcode)
+		return "%s %s, %s, %s, %s" %(self.street_number, self.street_address, self.city, self.state, self.postal_code)

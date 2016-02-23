@@ -35,12 +35,12 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
 
 class RegisterProfileView(View):
 	model = User
-	form = UserCreationForm
+	form_class = UserCreationForm
 	template_name = 'accounts/register_user/step1.html'
 
 	def get(self, request, *args, **kwargs):
 		
-		form = self.form()
+		form = self.form_class()
 
 		context = {
 			'form': form,
@@ -52,13 +52,8 @@ class RegisterProfileView(View):
 
 		
 		if request.method == "POST":
-			form = UserCreationForm(request.POST, request.FILES)
+			form = self.form_class(request.POST, request.FILES)
 			if form.is_valid():
-
-				# username = request.POST['username']
-				# email = request.POST['email']
-				# first_name = request.POST['first_name']
-				# last_name = request.POST['last_name']
 
 				username = form.cleaned_data.get('username')
 				email = form.cleaned_data.get('email')
@@ -92,28 +87,30 @@ class RegisterProfileView(View):
 				user.is_online = True
 				user.save()
 				return HttpResponseRedirect('%s'%(reverse('accounts:register_address')))
-			else:
-				context = {
-					'form': form,
-				}
+			# else:
+		context = {
 
-				print("uh oh, something went wrong")
-				return render(request, self.template_name, context)
+			'form': form,
+
+		}	
+
+		print("uh oh, something went wrong")
+		return render(request, self.template_name, context)
 
 class RegisterAddressView(View):
 	model = UserAddress
-	form = UserAddressForm
-	form2 = FullUserAddressForm
+	# form = UserAddressForm
+	form = FullUserAddressForm
 	template_name = 'accounts/register_user/step2.html'
 
 	def get(self, request, *args, **kwargs):
 		
 		form = self.form()
-		form2 = self.form2()
+		# form2 = self.form2()
 
 		context = {
 			'form': form,
-			'form2': form2, 
+			# 'form2': form2, 
 		}
 
 		return render(request, self.template_name, context)
@@ -121,29 +118,28 @@ class RegisterAddressView(View):
 	def post(self, request, *args, **kwargs):
 
 		# form = UserAddressForm(request.POST)
-		form2 = FullUserAddressForm(request.POST)
-
+		
 		if request.method == "POST":
-			if form2.is_valid():
-				print form2.cleaned_data
-			# 	# street_number = request.POST['street_number']
-			# 	# street_address = request.POST['street_address']
-			# 	# city = request.POST['city']
-			# 	# state = request.POST['state']
-			# 	# zipcode = request.POST['zipcode']
 
-			# 	# address = UserAddress.objects.create_address(street_number=street_number, street_address=street_address, city=city, state=state, zipcode=zipcode)
+			form = FullUserAddressForm(request.POST)
+			
+			if form.is_valid():
+				
+				street_number = form.cleaned_data.get('street_number')
+				street_address = form.cleaned_data.get('street_address')
+				city = form.cleaned_data.get('city')
+				state = form.cleaned_data.get('state')
+				postal_code = form.cleaned_data.get('postal_code')
+				print form.cleaned_data
+				
+				new_address = UserAddress.objects.create_address(street_number, street_address, city, state, postal_code)
+				new_address.user = request.user
+				
+				new_address.save()
 
-			# 	# user = User.objects.get(id=request.session['user_id'])
-			# 	# address.user = user
-			# 	user = request.user
-			# 	user.address = request.POST['address']
-			# 	# address.save()
-			# 	user.save()
+				return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
 
-			# 	return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
-			# else:
-			# 	return render(request, self.template_name, context)
+		return render(request, self.template_name, context)
 
 class RegisterPaymentView(View):
 	model = User

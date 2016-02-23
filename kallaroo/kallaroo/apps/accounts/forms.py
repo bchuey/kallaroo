@@ -31,33 +31,35 @@ class UserCreationForm(forms.ModelForm):
 			user = User.objects.all().filter(username=username)
 			if user:
 				raise forms.ValidationError("Sorry, an account with that username has already been registered.")
-		except User.DoesNotExist:
-			return username
+		except:
+			pass
 
-
+		return username
 
 	def clean_email(self):
-		EMAIL_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b')
+		EMAIL_REGEX = re.compile(r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b')
 		email = self.cleaned_data.get('email')
 		
 		try:
 			user = User.objects.all().filter(email=email)
 			if user:
 				raise forms.ValidationError("Sorry, this email has already been registered.")
-		except User.DoesNotExist:
-			if not EMAIL_REGEX.match(email):
-				raise forms.ValidationError("Invalid email. Please try again.")
-			return email
+		except:
+			pass
+
+		if not EMAIL_REGEX.match(email):
+			raise forms.ValidationError("Invalid email. Please try again.")
+		return email
 
 	def clean_first_name(self):
-		NAME_REGEX = re.compile(r'[a-zA-Z]*')
+		NAME_REGEX = re.compile(r'\b[a-zA-Z]+$\b')
 		first_name = self.cleaned_data.get('first_name')
 		if not NAME_REGEX.match(first_name):
 			raise forms.ValidationError("Invalid name. Your first name must only include letters.")
 		return first_name
 
 	def clean_last_name(self):
-		NAME_REGEX = re.compile(r'[a-zA-Z]*')
+		NAME_REGEX = re.compile(r'\b[a-zA-Z]+$\b')
 		last_name = self.cleaned_data.get('last_name')
 		if not NAME_REGEX.match(last_name):
 			raise forms.ValidationError("Invalid name. Your first name must only include letters.")
@@ -84,19 +86,19 @@ class FullUserAddressForm(forms.ModelForm):
 		('CA', 'CA'),
 		('TX', 'TX'),
 	)
-	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control'}))
-	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control'}))
-	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control'}))
+	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Street Number e.g. 1121'}))
+	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Street Address e.g. Mission St.'}))
+	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'City e.g. San Francisco'}))
 	state = forms.ChoiceField(label='State', choices=STATE_CHOICES, widget=forms.Select(attrs={'class':'form-control'}))
-	zipcode = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control'}))
+	postal_code = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Postal Code e.g. 94011 or 94011-0922'}))
 
 	class Meta:
 		model = UserAddress
-		fields = ('street_number', 'street_address', 'city', 'state', 'zipcode')
+		fields = ('street_number', 'street_address', 'city', 'state', 'postal_code')
 
 	def clean_street_number(self):
 		street_number = self.cleaned_data.get('street_number')
-		STREET_NUMBER_REGEX = re.compile(r'[0-9]*')
+		STREET_NUMBER_REGEX = re.compile(r'[0-9]+$')
 		if not STREET_NUMBER_REGEX.match(street_number):
 			raise forms.ValidationError("Street Number can only contain digits 0-9")
 		return street_number
@@ -104,7 +106,7 @@ class FullUserAddressForm(forms.ModelForm):
 
 	def clean_street_address(self):
 		street_address = self.cleaned_data.get('street_address')
-		STREET_ADDRESS_REGEX = re.compile(r'[a-zA-Z\-]*')
+		STREET_ADDRESS_REGEX = re.compile(r'[a-zA-Z\-]+')
 		if not STREET_ADDRESS_REGEX.match(street_address):
 			raise forms.ValidationError("Street Address can only contain lowercase/uppercase letters, and dashes.")
 		return street_address
@@ -112,7 +114,7 @@ class FullUserAddressForm(forms.ModelForm):
 
 	def clean_city(self):
 		city = self.cleaned_data.get('city')
-		CITY_REGEX = re.compile(r'[a-zA-Z\-]*')
+		CITY_REGEX = re.compile(r'[a-zA-Z\-]+')
 		if not CITY_REGEX.match(street_address):
 			raise forms.ValidationError("Valid city names can only contain lowercase/uppercase letters, and dashes.")
 		return city
@@ -120,14 +122,13 @@ class FullUserAddressForm(forms.ModelForm):
 	def clean_state(self):
 		pass
 
-	def clean_zipcode(self):
-		zipcode = self.cleaned_data.get('zipcode')
-		NINE_DIGIT_ZIP_REGEX = re.compile(r'[0-9]{5}(\-[0-9]{4})?$')
-		FIVE_DIGIT_ZIP_REGEX = re.compile(r'[0-9]{5}')
+	def clean_postal_code(self):
+		postal_code = self.cleaned_data.get('postal_code')
+		POSTAL_CODE_REGEX = re.compile(r'\d{5}(-\d{4})?$')
 		# 99577-0727
-		if not NINE_DIGIT_ZIP_REGEX.match(zipcode) or not FIVE_DIGIT_ZIP_REGEX.match(zipcode):
-			raise forms.ValidationError("")
-		return zipcode
+		if not POSTAL_CODE_REGEX.match(postal_code):
+			raise forms.ValidationError("Invalid postal code combination")
+		return postal_code
 
 
 class UserAddressForm(forms.ModelForm):
