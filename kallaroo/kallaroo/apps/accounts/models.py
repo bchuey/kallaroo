@@ -9,6 +9,8 @@ from django.core.validators import RegexValidator
 import braintree
 import stripe
 
+from encrypted_fields import EncryptedCharField
+
 """
 *Don't forget to import the PLATFORM_SECRET_KEY
 
@@ -82,6 +84,8 @@ class User(AbstractBaseUser):
 	# payment_method_token = models.CharField(max_length=255, null=True, blank=True)
 
 	### Stripe (Managed Accounts) ###
+
+	# change fields to encrypted fields
 	date_of_birth = models.DateField(auto_now_add=False, auto_now=False, null=True, blank=True)
 	stripe_account_id = models.CharField(max_length=255, null=True, blank=True)
 	stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
@@ -107,8 +111,8 @@ class User(AbstractBaseUser):
 		db_table = 'users'
 
 	def get_full_name(self):
-		full_name = '%s' + ' ' + '%s' %(first_name, last_name)
-		return self.full_name
+		full_name = '%s %s' %(self.first_name, self.last_name)
+		return full_name
 
 	def get_short_name(self):
 		return self.username
@@ -121,6 +125,14 @@ class User(AbstractBaseUser):
 
 	def has_module_perms(self, app_label):
 		return True
+
+	def format_date_of_birth(self, date_of_birth):
+		dob = date_of_birth.split('-')
+		year = dob[0]
+		month = dob[1]
+		day = dob[2]
+
+		return day, month, year
 
 	"""
 	You can call these instance methods in a view later on.
@@ -256,11 +268,11 @@ class UserAddress(models.Model):
 		('CA', 'CA'),
 		('TX', 'TX'),
 	)
-	street_number = models.IntegerField()
+	street_number = models.CharField(max_length=10)
 	street_address = models.CharField(max_length=60)
 	city = models.CharField(max_length=60)
 	state = models.CharField(max_length=2, choices=STATE_CHOICES, default='AZ')
-	postal_code = models.IntegerField()
+	postal_code = models.CharField(max_length=10)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
 	objects = UserAddressManager()

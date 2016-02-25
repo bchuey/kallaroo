@@ -24,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 import braintree
 import stripe
 import time
+import os
 
 braintree.Configuration.configure(braintree.Environment.Sandbox,
     merchant_id=settings.BRAINTREE_MERCHANT_ID,
@@ -139,6 +140,11 @@ class RegisterAddressView(View):
 
 				return HttpResponseRedirect('%s'%(reverse('accounts:register_payment')))
 
+		context = {
+			'form': form,
+		}
+
+		print("error, something went wrong")
 		return render(request, self.template_name, context)
 
 class RegisterPaymentView(View):
@@ -190,20 +196,26 @@ class RegisterPaymentView(View):
 		""" Stripe Integration """
 		
 		# grab user date of birth
-		user.date_of_birth = request.POST['date_of_birth']
+		dob = request.POST['date_of_birth']
 		print("==========")
-		print(user.date_of_birth)	# 1980-01-29
+		print(dob)	# 1980-01-29
 		print("==========")
 
-		dob = user.date_of_birth
+		# dob = user.date_of_birth
 
-		dob = dob.split('-')
+		# dob = dob.split('-')
 
-		year = dob[0]
-		month = dob[1]
-		day = dob[2]
+		# year = dob[0]
+		# month = dob[1]
+		# day = dob[2]
+		print user.get_full_name()
+
+		day, month, year = user.format_date_of_birth(dob)
+
+		print day, month, year
 
 		stripe.api_key = 'sk_test_BvXnJuHaPBDFDR0nou3Qq4Qn'
+		# stripe.api_key = os.environ['STRIPE_API_KEY']
 
 		# create the account
 		result = stripe.Account.create(
@@ -250,7 +262,7 @@ class RegisterPaymentView(View):
 
 		# use the stripeToken to create a Customer w/ credit card
 		customer = stripe.Customer.create(
-		  description="Stripe account for: " + user.first_name + " " + user.last_name,
+		  description="Stripe account for: " + user.get_full_name(),
 		  source=stripe_cc_token,
 		)
 

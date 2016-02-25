@@ -39,7 +39,8 @@ class UserCreationForm(forms.ModelForm):
 	def clean_email(self):
 		EMAIL_REGEX = re.compile(r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b')
 		email = self.cleaned_data.get('email')
-		
+		email = email.lower()
+
 		try:
 			user = User.objects.all().filter(email=email)
 			if user:
@@ -49,6 +50,7 @@ class UserCreationForm(forms.ModelForm):
 
 		if not EMAIL_REGEX.match(email):
 			raise forms.ValidationError("Invalid email. Please try again.")
+
 		return email
 
 	def clean_first_name(self):
@@ -56,6 +58,9 @@ class UserCreationForm(forms.ModelForm):
 		first_name = self.cleaned_data.get('first_name')
 		if not NAME_REGEX.match(first_name):
 			raise forms.ValidationError("Invalid name. Your first name must only include letters.")
+
+		first_name = first_name.capitalize()
+
 		return first_name
 
 	def clean_last_name(self):
@@ -63,6 +68,9 @@ class UserCreationForm(forms.ModelForm):
 		last_name = self.cleaned_data.get('last_name')
 		if not NAME_REGEX.match(last_name):
 			raise forms.ValidationError("Invalid name. Your first name must only include letters.")
+
+		last_name = last_name.capitalize() 
+
 		return last_name
 
 
@@ -86,11 +94,11 @@ class FullUserAddressForm(forms.ModelForm):
 		('CA', 'CA'),
 		('TX', 'TX'),
 	)
-	street_number = forms.IntegerField(label="Street Number", widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Street Number e.g. 1121'}))
+	street_number = forms.CharField(label="Street Number", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Street Number e.g. 1121'}))
 	street_address = forms.CharField(label="Street Address", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Street Address e.g. Mission St.'}))
 	city = forms.CharField(label="City", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'City e.g. San Francisco'}))
 	state = forms.ChoiceField(label='State', choices=STATE_CHOICES, widget=forms.Select(attrs={'class':'form-control'}))
-	postal_code = forms.IntegerField(label="Postal Code", widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Postal Code e.g. 94011 or 94011-0922'}))
+	postal_code = forms.CharField(label="Postal Code", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Postal Code e.g. 94011 or 94011-0922'}))
 
 	class Meta:
 		model = UserAddress
@@ -98,6 +106,7 @@ class FullUserAddressForm(forms.ModelForm):
 
 	def clean_street_number(self):
 		street_number = self.cleaned_data.get('street_number')
+
 		STREET_NUMBER_REGEX = re.compile(r'[0-9]+$')
 		if not STREET_NUMBER_REGEX.match(street_number):
 			raise forms.ValidationError("Street Number can only contain digits 0-9")
@@ -115,12 +124,12 @@ class FullUserAddressForm(forms.ModelForm):
 	def clean_city(self):
 		city = self.cleaned_data.get('city')
 		CITY_REGEX = re.compile(r'[a-zA-Z\-]+')
-		if not CITY_REGEX.match(street_address):
+		if not CITY_REGEX.match(city):
 			raise forms.ValidationError("Valid city names can only contain lowercase/uppercase letters, and dashes.")
 		return city
 
-	def clean_state(self):
-		pass
+	# def clean_state(self):
+	# 	pass
 
 	def clean_postal_code(self):
 		postal_code = self.cleaned_data.get('postal_code')
@@ -185,7 +194,19 @@ class StripePaymentForm(forms.Form):
 	routing_number = forms.CharField(label='Routing #', max_length=255, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'please enter your routing #'}))
 	
 	# clean the info somehow
+	def clean_date_of_birth(self):
+		pass
 
+	def clean_bank_account(self):
+		pass
+
+	def clean_bank_name(self):
+		pass
+
+	def clean_routing_number(self):
+		pass
+
+	
 
 """
 ===============

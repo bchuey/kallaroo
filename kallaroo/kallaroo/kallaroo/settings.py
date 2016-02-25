@@ -190,5 +190,9 @@ STRIPE_TEST_PUBLISHABLE_KEY = "pk_test_ibg1UGcODKHiCZeMSEuMxaCt"
 STRIPE_LIVE_SECRET_KEY = "sk_live_BvBOUPNp4anAh96LcsQRrOGr"
 STRIPE_LIVE_PUBLISHABLE_KEY = "pk_live_bQeilRqiPAnWXSeWENpc8G39"
 
-
-
+"""
+======================
+Django Encrypted Keys
+======================
+"""
+ENCRYPTED_FIELD_KEYDIR = os.path.join(BASE_DIR, 'keyset')
