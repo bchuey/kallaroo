@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+	
+{% endblock %}
+
+
+{% block jquery %}
+	
+{% endblock %}
+
+
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row border-top-gray" id="create-task-progress">
+	<div class="container">
+		<div class="col-md-4 section-static text-center orange">
+			<span class="glyphicon glyphicon-search glyphicon-md " ></span> <span>1. Choose Subcategory</span>
+		</div>
+		<div class="col-md-4 section-static col-middle text-center">
+			<span class="glyphicon glyphicon-home glyphicon-md" ></span> <span>2. Set Address</span>
+		</div>
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-pencil glyphicon-md"></span> <span>3. Task Details</span>
+		</div>
+	</div>
+</div>
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form action="{% url 'tasks:task_step' wizard.steps.current %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+				{% csrf_token %}
+				{{ wizard.management_form }}
+				<div class="col-md-12 task-field-container">
+					{{ wizard.form.subcategory.label }}
+					{{ wizard.form.subcategory }}
+				</div>
+				<input type="submit" value="Continue" id="add_task" class="btn-blue btn-blue-effect col-xs-12" />
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

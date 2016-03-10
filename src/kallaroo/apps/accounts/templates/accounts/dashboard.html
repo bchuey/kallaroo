@@ -1,0 +1,39 @@
+{% extends 'partials_base.html' %}
+{% block jsblock %}
+
+{% endblock %}
+{% block jquery %}
+
+
+	$(".sidenav-link").on("click", function(){
+
+		var href = $(this).attr('href');
+		
+		$.get(href, function( response ) {
+		  $( "#output" ).html( response );
+		});
+		return false;
+	});
+
+
+{% endblock %}
+{% block sockets %}
+
+
+{% endblock %}
+
+{% block sidebar %}
+	<div class="col-md-2 sidenav">
+		{% include 'user_menu.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-9">
+	<div class="row" id="output">
+		<div class="col-md-12">
+			<h2 class="no-margin-top">Your history for the past week:</h2>
+		</div>
+	</div>
+</div>
+{% endblock %}

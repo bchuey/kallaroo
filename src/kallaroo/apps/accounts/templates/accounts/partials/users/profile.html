@@ -1,0 +1,14 @@
+
+
+{% block content %}
+<div class="col-md-8">
+	<h3 class="no-margin-top">Account Details:</h3>
+	<form action="" method="POST" class="col-md-6">
+		{% csrf_token %}
+		{{ form.as_p }}
+		<input type="submit" value="Update" class="btn-green btn-green-effect" />
+	</form>
+</div>
+	
+
+{% endblock %}

@@ -1,0 +1,45 @@
+<html>
+<head>
+	<title>Chatroom</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var socket = io('http://127.0.0.1:8000/');
+
+			socket.on('connect', function(){
+				console.log('connect');
+			});
+
+			var entry_el = $("#msg");
+
+			socket.on('message', function(message){
+				var data = message.replace(/&/g, '&amp;').replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+				$("#msgs").append("<li>"+data+"</li");
+				window.scrollBy(0,1000000000);
+				entry_el.focus();
+			});
+
+			entry_el.keypress(function(event){
+				if(event.keyCode != 13) return;
+				var msg = entry_el.attr("value");
+				if(msg){
+					socket.emit("send_message", msg, function(data){
+						console.log(data);
+					});
+					entry_el.attr("value", "");
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+	<ul id="msgs">
+		{% for chat in chats %}
+			<li>{{char.author}}: {{chat.msg}}</li>
+		{% endfor %}
+	</ul>
+	<input type="text" id="msg" name="msg" />
+</body>
+</html>

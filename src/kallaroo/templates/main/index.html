@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<div class="jumbotron">
+	<div class="container">
+		{% include 'navbar.html' %}
+		<div class="row section-static">
+			<div class="col-md-12">
+				<h2 class="text-center">No More Waiting Around</h2>
+				<h4 class="text-center">Get what you want done immediately</h4>
+				<!-- search form -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row section-static" id="how-it-works">
+	<div class="container">
+		<div class="col-lg-12">
+			<h2 class="text-center">How Kall-a-roo Works</h2>
+			<div class="row section-static">
+				<div class="col-lg-4 text-center">
+					<span class="glyphicon glyphicon-pencil glyphicon-lg orange"></span>
+					<h4>Describe your need</h4>
+					<p>lorem ipsum</p>
+				</div>
+				<div class="col-lg-4 text-center">
+					<span class="glyphicon glyphicon-thumbs-up glyphicon-lg orange"></span>
+					<h4>Accept a bid</h4>
+					<p>lorem ipsum</p>
+				</div>
+				<div class="col-lg-4 text-center">
+					<span class="glyphicon glyphicon-heart-empty glyphicon-lg orange"></span>
+					<h4>Use your time wisely</h4>
+					<p>lorem ipsum</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row section-static section-light-gray" id="subcategory-groups">
+	<div class="container">
+		<div class="col-lg-12">
+			<h2 class="text-center">Hire a vetted independent contractor</h2>
+			<div class="row section-static">
+			{% for subcategory in subcategories %}
+			<div class="thumbnail col-md-4">
+				<img src="#" />
+				<div class="caption text-center">
+					<h4><a href="{% url 'categories:subcategory' subcategory.id %}" class="orange">{{ subcategory.title }}</a></h4>
+				</div>
+			</div>
+			{% cycle '' '' '</div><div class="row">' %}
+			{% endfor%}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row section-static section-blue" id="do-what-you-like">
+	<div class="container">
+		<div class="col-md-4">
+			<img src="#">
+		</div>
+		<div class="col-md-8">
+			<div class="col-md-6">
+				<h3>Spend less time worrying about...</h3>
+				<ul>
+					<li>the leaky pipes around the house</li>
+					<li>who's going to take care of your dog</li>
+					<li>if you have time to cook dinner or not</li>
+					<li>the current state of your frown lawn</li>
+				</ul>
+			</div>
+			<div class="col-md-6">
+				<h3>And spend more time...</h3>
+				<ul>
+					<li>catching up with friends</li>
+					<li>enjoying a bike ride around the city</li>
+					<li>living those precious moments with your kids</li>
+					<li>going outside to soak in what mother nature offers</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row section-static">
+	<div class="container">
+		<div class="col-lg-12">
+			<h2 class="text-center">Where We Can Be Found</h2>
+			<!-- insert 3D.js map that includes markers -->
+		</div>
+	</div>
+</div>
+<div class="row section-static section-light-gray">
+	<div class="container">
+		<h3 class="text-center">Why Use Kall-a-roo</h3>
+		<div class="row col-lg-12">
+			<div class="row section-static">
+				<div class="col-md-4 text-center">
+					<span class="glyphicon glyphicon-time glyphicon-md orange"></span>
+					<h4>Saves You Time</h4>
+					<p>lorem ipsum lorem ipsum</p>
+				</div>
+				<div class="col-md-4 text-center">
+					<span class="glyphicon glyphicon-eye-open glyphicon-md orange"></span>
+					<h4>Safety First</h4>
+					<p>lorem ipsum lorem ipsum</p>
+				</div>
+				<div class="col-md-4 text-center">
+					<span class="glyphicon glyphicon-user glyphicon-md orange"></span>
+					<h4>Vetted Contractors</h4>
+					<p>lorem ipsum lorem ipsum</p>
+				</div>
+			</div>
+		</div>
+		<div class="row col-lg-12">
+			<div class="row section-static">
+				<div class="col-md-4 text-center">
+					<span class="glyphicon glyphicon-search glyphicon-md orange"></span>
+					<h4>Easy To Get Help</h4>
+					<p>lorem ipsum lorem ipsum</p>
+				</div>
+				<div class="col-md-4 text-center">
+					<span class="glyphicon glyphicon-comment glyphicon-md orange"></span>
+					<h4>Effortless Communication</h4>
+					<p>lorem ipsum lorem ipsum</p>
+				</div>
+				<div class="col-md-4 text-center">
+					<span class="glyphicon glyphicon-usd glyphicon-md orange"></span>
+					<h4>Cash-free Payments</h4>
+					<p>lorem ipsum lorem ipsum</p>
+				</div>
+			</div>
+		</div>
+		<div class="row col-lg-12">
+			<p class="text-center"><a href="#" class="">Learn more</a></p>
+		</div>
+	</div>
+</div>
+<div class="row section-static">
+	<div class="container">
+		<h3 class="text-center">Ready to take back your free time? <a href="#" class="btn-custom btn-custom-primary btn-custom-lg">Kall-a-roo</a></h3>
+	</div>
+</div>
+{% endblock %}
+{% block footer %}
+{% include 'footer.html' %}
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<script type="text/javascript">
+	Stripe.setPublishableKey('pk_test_ibg1UGcODKHiCZeMSEuMxaCt');
+</script>
+{% endblock %}
+
+{% block jquery %}
+	
+
+{% endblock %}
+{% block sockets %}
+	var socket = io.connect('http://127.0.0.1:3000');
+
+	$("#complete_registration").on("click", function(){
+		var user_id = {{ request.user.id }};
+		socket.emit('assign-socket-id', {user_id:user_id});
+
+
+	});
+
+	// stripe
+
+	 jQuery(function($) {
+	   $('#payment-form').submit(function(event) {
+	     var $form = $(this);
+
+	    // Disable the submit button to prevent repeated clicks
+	     $form.find('#complete_registration').prop('disabled', true);
+
+	     Stripe.card.createToken($form, stripeResponseHandler);
+
+	    // Prevent the form from submitting with the default action
+	    return false;
+	   });
+	 });
+
+	function stripeResponseHandler(status, response) {
+	  var $form = $('#payment-form');
+
+	  if (response.error) {
+	    // Show the errors on the form
+	    $form.find('.payment-errors').text(response.error.message);
+	    $form.find('button').prop('disabled', false);
+	  } else {
+	    // response contains id and card, which contains additional card details
+	    var token = response.id;
+	    console.log(response);
+	    // Insert the token into the form so it gets submitted to the server
+	    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+	    // and submit
+	    $form.get(0).submit();
+	  }
+	};
+	
+
+{% endblock %}
+
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row border-top-gray" id="create-task-progress">
+	<div class="container">
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-user glyphicon-md" ></span> <span>1. Register Profile</span>
+		</div>
+		<div class="col-md-4 section-static col-middle text-center">
+			<span class="glyphicon glyphicon-home glyphicon-md"></span> <span>2. Add Address</span>
+		</div>
+		<div class="col-md-4 section-static text-center orange">
+			<span class="fa fa-credit-card glyphicon-md"></span> <span> 3. Payment Method</span>
+		</div>
+	</div>
+</div>
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form id="payment-form" action="{% url 'accounts:register_payment' %}" method="POST">
+				{% csrf_token %}
+
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-birthday-cake"></i>
+						</div>
+						{{ form.date_of_birth }}
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-university"></i>
+						</div>
+						{{ form.bank_account }}
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-balance-scale"></i>
+						</div>
+						{{ form.routing_number }}
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-university"></i>
+						</div>
+						{{ form.bank_name }}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-credit-card"></i>
+						</div>
+						<input type="text" class="form-control" data-stripe="number" placeholder="credit card number"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="glyphicon glyphicon-credit-card"></i>
+						</div>
+						<input type="text" class="form-control" data-stripe="cvc" placeholder="cvc"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-calendar"></i>
+						</div>
+						<input type="text" class="form-control"  data-stripe="exp-month" placeholder="expiration month (e.g. 04)"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-calendar"></i>
+						</div>
+						<input type="text" class="form-control"  data-stripe="exp-year" placeholder="expiration year (e.g. 2018)"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<div class="input-group-addon">
+							<i class="fa fa-money"></i>
+						</div>
+						<input type="text" class="form-control" data-stripe="currency" value="usd" disabled />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<input type="submit" id="complete_registration" value="Complete Registration" class="col-xs-12 btn-blue btn-blue-effect" />
+				</div>
+			</form>
+			
+		</div>
+		<div class="col-md-12">
+			<p>Payment processing services for [account holder term, e.g. drivers or sellers] on [platform name] are provided by Stripe and are subject to the Stripe Connected Account Agreement, which includes the Stripe Terms of Service (collectively, the “Stripe Services Agreement”). By agreeing to [this agreement / these terms / etc.] or continuing to operate as a [account holder term] on [platform name], you agree to be bound by the Stripe Services Agreement, as the same may be modified by Stripe from time to time. As a condition of [platform name] enabling payment processing services through Stripe, you agree to provide [platform name] accurate and complete information about you and your business, and you authorize [platform name] to share it and transaction information related to your use of the payment processing services provided by Stripe.</p>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

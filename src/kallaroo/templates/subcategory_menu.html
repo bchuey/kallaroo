@@ -1,0 +1,9 @@
+<nav class="navbar navbar-default sidenav">
+  <div class="collapse navbar-collapse sidenav" id="bs-example-navbar-collapse-1">
+    <ul class="nav nav-stacked sidenav-stacked text-center">
+      {% for subcategory in object_list %}
+        <li><a href="{% url 'categories:subcategory' subcategory.id %}" class="subcategory_link">{{ subcategory.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </div><!-- /.navbar-collapse -->
+</nav>

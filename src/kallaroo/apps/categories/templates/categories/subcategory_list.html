@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block jquery %}
+	$(".subcategory_link").on("click", function(){
+
+		var href = $(this).attr('href');
+		
+		$.get(href, function( response ) {
+		  $( "#subcategory_detail" ).html( response );
+		});
+		return false;
+	});
+
+	
+{% endblock %}
+
+{% block navbar %}
+<div class="row">
+	<div class="container">
+		{% include 'partials_navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<div class="col-md-3 ">
+			{% include 'subcategory_menu.html' %}
+		</div>
+		<div class="col-md-9" id="subcategory_detail">
+
+		</div>
+	</div>
+</div>
+{% endblock %}

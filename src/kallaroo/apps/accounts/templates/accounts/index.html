@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block jsblock %}
+<script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+{% endblock %}
+
+
+
+
+{% block sockets %}
+	
+
+	$("form").on("submit", function(){
+
+		var socket = io.connect('http://127.0.0.1:3000');
+		// var user_id = {{ user.id }};
+		// socket.emit('assign-socket-id-after-login', {});
+		socket.emit('join_room', {});
+
+	});
+
+{% endblock %}
+
+
+
+{% block navbar %}
+<div class="row">
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<h1 class="text-center">Registration/Login</h1>
+		<div class="col-md-6">
+			
+		</div>
+		<div class="col-md-6">
+			<form action="{% url 'accounts:login' %}" method="POST">
+				{% csrf_token %}
+				<div class='form-group input-group'>
+					<div class='input-group-addon'>
+						<span class='glyphicon glyphicon-envelope'></span>
+					</div>
+					{{ login_form.email }}
+				</div>
+				<div class='form-group input-group'>
+					<div class='input-group-addon'>
+						<span class='glyphicon glyphicon-lock'></span>
+					</div>
+					{{ login_form.password }}
+				</div>
+				<input type="submit" value="Login" id="login_user" class="btn-login btn-login-effect" />
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

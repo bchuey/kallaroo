@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block jsblock %}
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5rDIK5VhVda2tXaw-h28AvAObJhVeVfY&callback=initMap"
+  type="text/javascript"></script>
+  <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+
+{% endblock %}
+{% block styles %}
+	{% if task.address %}
+		#map {
+			height: 400px;
+		}
+	{% endif %}
+{% endblock %}
+{% block jquery %}
+	
+	{% if object.final_bid != None or object.user != request.user %}
+		$(".bid-accept-btn").attr("disabled",true);
+		
+	{% endif %}
+	
+	{% if object.final_bid != None %}
+		$(".bid-submit-btn").attr("disabled",true);
+	{% endif %}
+	
+	// Load the map with address of task
+	window.onload = function initMap() {
+		// console.log("{{ task.address }}");
+		var address = "{{ task.address }}";
+
+		geocoder = new google.maps.Geocoder();
+
+		geocoder.geocode({ 'address': address }, function(results, status) {
+		  if (status == google.maps.GeocoderStatus.OK) {
+		  	var map = new google.maps.Map(document.getElementById('map'), {
+		  		center: results[0].geometry.location,
+		  		zoom: 12,
+			  });
+		    var marker = new google.maps.Marker({
+			    map: map,
+			    position: results[0].geometry.location,
+			  });
+		  }
+
+
+		});
+
+	}
+
+	$("#add_review_btn").on("click", function(){
+		$("#add_review").append()
+	});
+{% endblock %}
+{% block sockets %}
+	
+	// Realtime notifications
+	// Get the session of the logged in contractor (?)
+	var socket = io.connect('http://127.0.0.1:3000');
+
+	var task_id = {{ object.id }};
+	socket.emit("auction-number", {task_id:task_id});
+
+
+	socket.on('message', function(context){
+
+		console.log(context);
+
+		var obj = jQuery.parseJSON(context);
+		contractor_id = obj.contractor.id;
+		bid_id = obj.id;
+
+		console.log(obj);
+		$("#bid-wrapper").append("<div class='thumbnail col-md-4'><div class='caption'><div class='col-md-12'><div class='col-md-4'><img src='#'></div><div class='col-md-8'><p>" + obj.contractor.first_name + obj.contractor.last_name + "</p><p>" + obj.contractor.email + "</p><p>" + obj.contractor.rating + " stars</p><p>" + "<p>" + obj.contractor.subcategory + "</p></div></div><div class='col-md-12 text-center border-top-gray padding-top-10'><div class='col-md-6'><span class='glyphicon glyphicon-time blue'></span> <span>" + obj.estimated_hours + " hrs</span></div><div class='col-md-6'><span class='glyphicon glyphicon-usd green'></span>" + "<span>" + obj.amount + "</span></div><div class='col-md-12 padding-top-10 padding-bottom-10'>{% if object.user == request.user %}<form action='{% url 'tasks:accept_bid' %}' method='POST'>{% csrf_token %}<input type='hidden' id='task_id' name='task_id' value='{{ object.id }}' /><input type='hidden' id='bid_id' name='bid_id' value='" + bid_id + "'" + " /><input type='hidden' id='contractor_id' name='contractor_id'" + "value='" + contractor_id + "'" + " />{% if object.final_bid != None and object.final_bid == bid %}<input type='submit' value='Accepted' class='accept-bid bid-accept-btn btn-accept-task btn-accept-task-effect'/>{% elif object.final_bid != None %}<input type='submit' value='Rejected' class='accept-bid bid-accept-btn btn-red btn-red-effect'/>{% else %}<input type='submit' value='Accept' class='accept-bid bid-accept-btn btn-accept-task btn-accept-task-effect'/>{% endif %}</form>{% endif %}</div></div></div></div>");
+		
+
+	});
+
+
+
+
+{% endblock %}
+{% block navbar %}
+<div id="confirmation-message" class="row">
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }} text-center" role="alert">
+			{{ message }}
+		</div>
+		{% endfor %}
+	{% endif %}
+</div>
+<div class="row">
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="row section-light-gray section-static border-top-gray">
+	<div class="container">
+		<div class="col-md-12">
+			<div class="thumbnail thumbnail-task-list col-md-6">
+				<img src="#" class="col-md-3" />
+				<div class="caption col-md-9">
+					<h3>{{ object.title }}</h3>
+					<p>{{ object.description }}</p>
+					<p>{{ object.special_instructions }}</p>
+					<h4 class="pull-right">listed by: {{ object.user.username }}</h4>
+				</div>
+			</div>
+			<div id="map" class="col-md-6">
+				<!-- google map goes here -->
+			</div>
+		</div>
+		{% if request.user.is_contractor %}
+		<div class="col-md-12">
+			<form action="{% url 'tasks:task_detail' object.id %}" method="POST" class="col-md-6">
+				{% csrf_token %}
+				{{ bid_form.as_p }}
+				<input type="hidden" id="task_id" name="task_id" value="{{ object.id }}" />
+				<input type="submit" value="Submit Bid" class="bid-submit-btn btn-submit-bid btn-submit-bid-effect" />
+			</form>
+		</div>
+		{% endif %}
+		{% if not request.user.is_contractor %}
+		<div class="col-md-12">
+			
+			<h3>Bids:</h3>
+			<div id="bid-wrapper" class="row col-md-12">
+			{% if bids %}	
+				{% for bid in bids %}
+				<div class="thumbnail col-md-4">
+					<div class="caption">
+						<div class="col-md-12">
+							<div class="col-md-4">
+								<img src="...">
+							</div>	
+							<div class="col-md-8">
+								<p>{{ bid.contractor.first_name }} {{ bid.contractor.last_name }}</p>
+								<p>{{ bid.contractor.email }}</p>
+								<p>111-111-1111</p>
+								<p>_ jobs completed</p>
+								<p>{{ bid.contractor.contractorprofile.rating }} stars</p>
+								<p>{{ bid.contractor.contractorprofile.subcategory.title }}</p>
+							</div>
+						</div>
+						<div class="col-md-12 text-center border-top-gray padding-top-10">
+							<div class="col-md-6">
+								<span class="glyphicon glyphicon-time blue"></span> <span>{{ bid.estimated_hours }} hrs</span>
+							</div>
+							<div class="col-md-6">
+								<span class="glyphicon glyphicon-usd green"></span> <span>{{ bid.amount }}</span>
+							</div>
+							<div class="col-md-12 padding-top-10 padding-bottom-10">
+								{% if object.user == request.user %}
+								<form action="{% url 'tasks:accept_bid' %}" method="POST" >
+									{% csrf_token %}
+									<input type="hidden" id="task_id" name="task_id" value="{{ object.id }}" />
+									<input type="hidden" id="bid_id" name="bid_id" value="{{ bid.id }}" />
+									<input type="hidden" id="contractor_id" name="contractor_id" value="{{ bid.contractor.id }}" />
+									{% if object.final_bid != None and object.final_bid == bid %}
+									<input type="submit" value="Accepted" class="accept-bid bid-accept-btn btn-accept-task btn-accept-task-effect"/>
+									{% elif object.final_bid != None %}
+									<input type="submit" value="Rejected" class="accept-bid bid-accept-btn btn-red btn-red-effect"/>
+									{% else %}
+									<input type="submit" value="Accept" class="accept-bid bid-accept-btn btn-accept-task btn-accept-task-effect"/>
+									{% endif %}
+								</form>
+								{% endif %}
+							</div>
+						</div>						
+					</div>
+				</div>
+				{% cycle '' '' '' '</div><div class="row col-md-12">' %}
+				{% endfor %}
+			{% else %}
+			<h3>No active bids</h3>
+			{% endif %}
+		</div>
+	</div>
+	
+	{% endif %}
+	<div class="row">
+		<div class="container">
+			<div class="col-md-12">
+				<h3>Reviews</h3>
+				{% for review in reviews %}
+				<div class="well col-md-8">
+					<p>written by: {{ review.author }} | written on: {{ review.posted_at }}</p>
+					<p>{{ review.rating }}</p>
+					<p>{{ review.comment }}</p>
+				</div>
+				{% endfor %}
+				{% if not request.user.is_contractor %}
+				<div class="row">
+					<div id="add_review" class="col-md-12">
+						<form action="{% url 'reviews:create_review' %}" method="POST" class="col-md-6">
+						{% csrf_token %}
+						<input type="hidden" id="task_id" name="task_id" value="{{ object.id }}" />
+						{% for field in review_form %}
+						<div class="form-group">
+							{{ field.label }}
+							{{ field}}
+						</div>
+						{% endfor %}
+						<div class="form-group">
+							<input type="submit" value="Submit Review" class="btn-orange btn-orange-effect"/>
+						</div>
+						</form>
+					</div>
+
+					<div class="col-md-12">
+					<hr>
+						<button id="add_review_btn" class="btn-blue btn-blue-effect">Add Review</button>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="container">
+			<div id="responseOutput" class="col-md-4">
+
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

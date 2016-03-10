@@ -1,0 +1,50 @@
+
+<nav class="navbar navbar-default navbar-transparent">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'home' %}">Kallaroo</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="{% url 'tasks:task_list' %}">Tasks</a></li>
+        {% if request.user.is_authenticated and not request.user.is_contractor %}
+        <li>
+            <a href="{% url 'accounts:contractors_all' %}">Contractors</a>
+        </li>
+        {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {% if request.user.is_authenticated %}
+          {% if not request.user.is_contractor %}
+          <li>
+            <a href="{% url 'tasks:task_step' 'subcategory' %}">Add Task</a>
+          </li>
+          {% endif %}
+        <li><a href="{% url 'accounts:dashboard' request.user.id %}">My Dashboard</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.user.username }} <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="text-center"><a href="{% url 'accounts:logout' %}">Logout</a></li>
+          </ul>
+        </li>
+      	{% else%}
+        <li><a href="{% url 'accounts:register_profile' %}">Sign Up</a></li>
+        <li><a href="{% url 'how-it-works' %}">How It Works</a></li>
+        <li>
+        	<a href="{% url 'accounts:main' %}">Login</a>
+        </li>
+        {% endif %}
+        
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

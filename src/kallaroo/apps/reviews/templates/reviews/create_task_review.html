@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row section-static">
+	<div class="container">
+		<form action="" method="POST">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<input type="submit" value="Submit Review" class="btn-orange btn-orange-effect"/>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

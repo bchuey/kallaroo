@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5rDIK5VhVda2tXaw-h28AvAObJhVeVfY&libraries=places"></script>
+{% endblock %}
+
+
+{% block jquery %}
+	var input = document.getElementById('id_address');
+	var options = {
+	  types: ['address'],
+	  componentRestrictions: {country:'us'}
+	};
+	autocomplete = new google.maps.places.Autocomplete(input, options);
+
+	google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    var place = autocomplete.getPlace();
+    for (var i = 0; i < place.address_components.length; i++) {
+      for (var j = 0; j < place.address_components[i].types.length; j++) {
+        if (place.address_components[i].types[j] == "postal_code") {
+          document.getElementById('id_address').value += ("," + " " + place.address_components[i].long_name);
+
+        }
+      }
+    }
+  })
+{% endblock %}
+
+
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row border-top-gray" id="create-task-progress">
+	<div class="container">
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-user glyphicon-md" ></span> <span>1. Register Profile</span>
+		</div>
+		<div class="col-md-4 section-static col-middle text-center orange">
+			<span class="glyphicon glyphicon-home glyphicon-md" ></span> <span>2. Add Address</span>
+		</div>
+		<div class="col-md-4 section-static text-center">
+			<span class="fa fa-credit-card glyphicon-md"></span> <span> 3. Payment Method</span>
+		</div>
+	</div>
+</div>
+
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form action="{% url 'accounts:register_address' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+				{% csrf_token %}
+				<div class="col-md-12 task-field-container">
+
+						<div class="form-group">
+							
+							{{ form.street_number.errors }}
+							{{ form.street_number }}
+							
+						</div>
+						<div class="form-group">
+							
+							{{ form.street_address.errors }}
+							{{ form.street_address }}
+							
+						</div>
+						<div class="form-group">
+							
+							{{ form.city.errors }}
+							{{ form.city }}
+							
+						</div>
+						<div class="form-group">
+						
+							{{ form.state.errors }}
+							{{ form.state }}
+							
+						</div>
+						<div class="form-group">
+						
+							{{ form.postal_code.errors }}
+							{{ form.postal_code }}
+							
+						</div>
+
+				</div>
+				<input type="submit" value="Continue" id="add_address" class="btn-blue btn-blue-effect col-xs-12" />
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block jsblock %}
+	
+{% endblock %}
+
+
+{% block jquery %}
+	
+	// if the checkbox is checked
+	//if(document.getElementById('id_is_contractor').checked){
+		// $("#id_subcategory").attr("disabled", true);
+		//alert('hello');
+	//}
+
+{% endblock %}
+
+{% block sockets %}
+	
+
+{% endblock %}
+
+{% block navbar %}
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="row border-top-gray" id="create-task-progress">
+	<div class="container">
+		<div class="col-md-4 section-static text-center">
+			<span class="glyphicon glyphicon-user glyphicon-md orange" ></span> <span class="orange">1. Register Profile</span>
+		</div>
+		<div class="col-md-4 section-static col-middle text-center">
+			<span class="glyphicon glyphicon-home glyphicon-md" ></span> <span>2. Add Address</span>
+		</div>
+		<div class="col-md-4 section-static text-center">
+			<span class="fa fa-credit-card glyphicon-md"></span> <span> 3. Payment Method</span>
+		</div>
+	</div>
+</div>
+<div class="row section-light-gray border-top-gray">
+	<div class="container" id="task-form-container">
+		<div class="col-md-12">
+			<form action="{% url 'accounts:register_profile' %}" method="POST" enctype="multipart/form-data" class="col-md-10 col-md-push-1">
+				{% csrf_token %}
+				<div class="col-md-12 task-field-container">
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-envelope"></i>
+							</div>
+							{{ form.email.errors }}
+							{{ form.email }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-user"></i>
+							</div>
+							{{ form.username.errors }}
+							{{ form.username }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-user"></i>
+							</div>
+							{{ form.first_name.errors }}
+							{{ form.first_name }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-user"></i>
+							</div>
+							{{ form.last_name.errors }}
+							{{ form.last_name }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-key"></i>
+							</div>
+							{{ form.password1.errors }}
+							{{ form.password1 }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-unlock-alt"></i>
+							</div>
+							{{ form.password2.errors }}
+							{{ form.password2 }}
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-file-picture-o"></i>
+							</div>
+							{{ form.profile_pic }}
+						</div>
+					</div>
+					<div class="form-group">
+						{{ form.is_contractor.label }}
+						{{ form.is_contractor }}
+
+					</div>
+					<div class="form-group">
+						{{ form.subcategory }}
+					</div>
+				</div>
+				<input type="submit" value="Continue" id="add_profile" class="btn-blue btn-blue-effect col-xs-12" />
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

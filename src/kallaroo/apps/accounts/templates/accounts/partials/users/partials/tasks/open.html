@@ -1,0 +1,18 @@
+
+
+
+{% if tasks %}
+	{% for task in tasks %}
+	<div class="thumbnail thumbnail-task-list col-md-12">
+		<img src="#" class="col-md-3" />
+		<div class="caption col-md-9">
+			<h3>{{ task.title }}</h3>
+			<p>{{ task.description }}</p>
+			<p><a href="{% url 'tasks:task_detail' task.id %}" class="btn-goto-task btn-goto-task-effect ">Go To Task</a></p>
+		</div>
+	</div>
+	{% endfor %}
+{% else %}
+	<h3>There are no open tasks</h3>
+{% endif %}
+

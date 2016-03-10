@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div class="row">
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<div class="col-md-6">
+			{% if object.profile_pic %}
+			<img src="{{ object.profile_pic.url }}" />
+			{% else %}
+			<h3>no photo available</h3>
+			{% endif %}
+		</div>
+		<div class="col-md-6">
+			<p>Username: {{ object.username }}</p>
+			<p>Full Name: {{ object.first_name }} {{ object.last_name }}</p>
+			<p>Email: {{ object.email }}</p>
+			<p>Subcategories: {{ object.contractorprofile.subcategory }}</p>
+			<p>Rating: {{ object.contractorprofile.rating }}</p>
+			<p>Jobs Completed: 0</p>
+			<p><a href="">Hire</a>
+				<form action="{% url 'chats:create-chatroom' %}" method="POST">
+					{% csrf_token %}
+					<input type="hidden" name="user_id" value="{{ request.user.id }}" />
+					<input type="hidden" name="contractor_id" value="{{ object.id }}" />
+					<input type="submit" value="Chat" class="btn-blue btn-blue-effect" />
+				</form>
+			</p>
+		</div>
+	</div>
+</div>
+<div class="row section-static">
+	<div class="container">
+		<h3>About me:</h3>
+		<p>lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum</p>
+	</div>
+</div>
+<div class="row section-static">
+	<div class="container">
+		<h3>Recent jobs completed:</h3>
+		<!-- loop through reviews [:6] -->
+	</div>
+</div>
+<div class="row section-static">
+	<div class="container">
+		<h3>Recent reviews:</h3>
+		<!-- loop through reviews [:6] -->
+
+		{% for review in reviews %}
+		<div class="well col-md-8">
+			<p>written by: {{ review.author }} | written on: {{ review.posted_at }}</p>
+			<p>{{ review.rating }}</p>
+			<p>{{ review.comment }}</p>
+		</div>
+		{% endfor %}
+
+		<div class="row">
+			<div class="col-md-12">
+				<div id="add_review" class="col-md-12">
+					<form action="{% url 'reviews:create_review' %}" method="POST" class="col-md-6">
+					{% csrf_token %}
+					<input type="hidden" id="reviewee_id" name="reviewee_id" value="{{ object.id }}" />
+					{% for field in review_form %}
+					<div class="form-group">
+						{{ field.label }}
+						{{ field}}
+					</div>
+					{% endfor %}
+					<div class="form-group">
+						<input type="submit" value="Submit Review" class="btn-orange btn-orange-effect"/>
+					</div>
+					</form>
+				</div>
+
+				<div class="col-md-12">
+				<hr>
+					<button id="add_review_btn" class="btn-blue btn-blue-effect">Add Review</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

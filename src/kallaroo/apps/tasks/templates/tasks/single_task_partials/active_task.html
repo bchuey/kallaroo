@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block jsblock %}
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5rDIK5VhVda2tXaw-h28AvAObJhVeVfY&callback=initMap"
+  type="text/javascript"></script>
+  <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+
+{% endblock %}
+{% block styles %}
+	{% if task.address %}
+		#map {
+			height: 250px;
+		}
+	{% endif %}
+{% endblock %}
+{% block jquery %}
+	
+	{% if object.final_bid != None or object.user != request.user %}
+		$(".bid-accept-btn").attr("disabled",true);
+		
+	{% endif %}
+	
+	{% if object.final_bid != None %}
+		$(".bid-submit-btn").attr("disabled",true);
+	{% endif %}
+
+	{% if object.task_status == "Paid" %}
+		$("#action-btn").attr("disabled", true);
+	{% endif %}
+	
+	// Load the map with address of task
+	window.onload = function initMap() {
+		// console.log("{{ task.address }}");
+		var address = "{{ task.address }}";
+
+		geocoder = new google.maps.Geocoder();
+
+		geocoder.geocode({ 'address': address }, function(results, status) {
+		  if (status == google.maps.GeocoderStatus.OK) {
+		  	var map = new google.maps.Map(document.getElementById('map'), {
+		  		center: results[0].geometry.location,
+		  		zoom: 15,
+			  });
+		    var marker = new google.maps.Marker({
+			    map: map,
+			    position: results[0].geometry.location,
+			  });
+		  }
+
+
+		});
+
+	};
+
+
+		
+
+		
+{% endblock %}
+{% block sockets %}
+	// Realtime notifications
+	// Get the session of the logged in contractor (?)
+	var socket = io.connect('http://127.0.0.1:3000');
+
+	// when accept button is clicked
+	
+	$(".accept-bid").click(function(){
+		
+		var user_id = {{ request.user.id }};
+
+		// set task_id equal to the value of input id of task_id
+		var task_id = {{ object.id }};
+
+		// set contractor equal to the contractor of selected bid
+		// might have to use some more jQuery here to grab that information
+		// OR we can grab it in the views.py by querying Task.final_bid.contractor.id
+		var contractor_id = 1;
+
+		// emit a socket named 'notification' passing through task_id and contractor_id
+
+		socket.emit("notification", {
+			user_id: user_id, 
+			task_id: task_id, 
+			contractor_id : contractor_id,
+		});
+
+		// listen to 'send_notification' and do something
+		socket.on("send_notification", function(response){
+			$("#responseOutput").append("<p>we got a response</p>");
+			console.log("success, we can grab the response");
+		});
+
+		// if you return false; "we got a response" is appended and page doesn't refresh, but the accept button doesn't get the disable attribute
+
+	});
+{% endblock %}
+{% block navbar %}
+<div id="confirmation-message" class="row">
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }} text-center" role="alert">
+			{{ message }}
+		</div>
+		{% endfor %}
+	{% endif %}
+</div>
+<div class="row">
+	<div class="container">
+		{% include 'navbar.html' %}
+	</div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<div class="col-md-8 col-md-push-2 text-center">
+			<h3>You have been matched with: </h3>
+			<img src="#" class="" alt="" />
+			<h3>{{ contractor.first_name }} {{ contractor.last_name }}</h3>
+		</div>
+	</div>
+</div>
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<div class="col-md-7">
+			<div class="col-md-4">
+				<h4>Estimated Hours</h4>
+				<h4><small>{{ object.final_bid.estimated_hours }}</small></h4>
+			</div>
+			<div class="col-md-4">
+				<h4>Hourly Rate</h4>
+				<h4><small>{{ object.final_bid.amount }}</small></h4>
+			</div>
+		</div>
+		<div id="confirmation" class="col-md-3">
+			{% if object.task_status == "Active" and object.task_clock_in == None %}
+			<form id="start-task" action="{% url 'tasks:start_task' %}" method="POST">
+				{% csrf_token %}
+				<input type="hidden" name="task_id" value="{{ object.id }}"/>
+				<input type="submit" id="action-btn" class="btn-green btn-green-effect col-md-12" value="Arrived"/>
+			</form>
+			{% elif object.task_clock_in != None and object.task_clock_out == None %}
+			<form id="end-task" action="{% url 'tasks:end_task' %}" method="POST">
+				{% csrf_token %}
+				<input type="hidden" name="task_id" value="{{ object.id }}"/>
+				<input type="submit" id="action-btn" class="btn-red btn-red-effect col-md-12" value="Finished"/>
+			</form>
+			{% elif object.task_status == "Completed" %}
+			<form id="send-payment" action="{% url 'tasks:send_payment' %}" method="POST">
+				{% csrf_token %}
+				<input type="hidden" name="task_id" value="{{ object.id }}"/>
+				<input type="hidden" name="contractor_id" value="{{ object.contractor.id }}" />
+				<input type="submit" id="action-btn" class="btn-blue btn-blue-effect col-md-12" value="Send Payment"/>
+			</form>
+			{% elif object.task_status == "Paid" %}
+				<button type="button" id="action-btn" class="btn-red btn-red-effect col-md-12">Payment Sent</button>
+			{% endif %}
+		</div>
+	</div>
+</div>
+<div class="row section-static border-top-gray section-light-gray">
+	<div class="container">
+		<div class="col-md-8">
+			<div class="col-md-12">
+				<h4>About this task</h4>
+				<p>{{ object.description }}</p>
+				<hr>
+				<h4>Special Instructions</h4>
+				<p>{{ object.special_instructions }}</p>
+				<hr>
+			</div>
+		</div>
+		<div class="panel panel-default col-md-4 no-padding">
+			<div class="panel-heading text-center">
+				<h4>More Info</h4>
+			</div>
+			<div class="panel-body">
+				<p>{{ contractor.first_name }} {{ contractor.last_name }}</p>
+				<p>{{ contractor.email }}</p>
+				<button type="button" id="" class="btn-blue btn-blue-effect col-md-12">Chat</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row section-static border-top-gray">
+	<div class="container">
+		<div id="map" class="col-md-12">
+				<!-- google map goes here -->
+		</div>
+	</div>
+</div>
+{% endblock %}
